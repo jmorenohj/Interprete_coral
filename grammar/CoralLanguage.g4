@@ -1,86 +1,5 @@
 grammar CoralLanguage;
 
-/*
-inicial : function_inicial
-        | codeblock;
-
-function_inicial : FUNCTION inicial_main_vs_id;
-
-function_no_inicial: FUNCTION main_vs_id;
-
-inicial_main_vs_id : TKN_ID func_def;
-
-main_vs_id : TKN_ID func_def
-           | main_def;
-
-func_def : TKN_CLOSING_PAR params_def TKN_CLOSING_PAR RETURNS func_def_returns codeblock FUNCTION main_vs_id;
-
-main_def: MAIN TKN_OPENING_PAR TKN_CLOSING_PAR RETURNS NOTHING codeblock;
-
-func_def_returns :   INTEGER func_def_returns_suffix
-                 |   FLOAT func_def_returns_suffix
-                 |   NOTHING;
-
-func_def_returns_suffix : ARRAY TKN_OPENING_PAR term_new_array TKN_CLOSING_PAR TKN_ID
-                        | TKN_ID
-                        |
-                        ;
-
-params_def : FLOAT TKN_ID params_suffix_def
-           | INTEGER TKN_ID params_suffix_def
-           |
-           ;
-
-params_def_non_empty: FLOAT TKN_ID params_suffix_def
-                    | INTEGER TKN_ID params_suffix_def;
-
-params_suffix_def: TKN_COMMA params_def_non_empty
-                 |
-                 ;
-
-operacion: TKN_OPENING_PAR operacion TKN_CLOSING_PAR operador
-         | signo operacion
-         | term operador;
-
-operador: TKN_TIMES operacion
-        | TKN_PLUS operacion
-        | TKN_MINUS operacion
-        | TKN_DIV operacion
-        | TKN_MOD operacion
-        |
-        ;
-
-term : TKN_INT
-     | TKN_ID id_suffix //Suffix might be "" for id, [] for array, () for function
-     | TKN_FLOAT
-     | RAND TKN_OPENING_PAR operacion TKN_COMMA operacion TKN_CLOSING_PAR
-     | ABS TKN_OPENING_PAR operacion TKN_CLOSING_PAR
-     | SQRT TKN_OPENING_PAR operacion TKN_CLOSING_PAR
-     | POW TKN_OPENING_PAR operacion TKN_COMMA operacion TKN_CLOSING_PAR;
-
-term_new_array : TKN_INT
-               | TKN_QUESTION_MARK;
-
-signo : TKN_PLUS
-      | TKN_MINUS;
-
-id_suffix : array_loc
-      | function_call
-      | TKN_PERIOD SIZE
-      |
-      ;
-
-array_loc : TKN_OPENING_BRA operacion TKN_CLOSING_BRA;
-
-function_call : TKN_OPENING_PAR params TKN_CLOSING_PAR;
-
-params : operacion params_suffix
-       |
-       ;
-params_suffix : TKN_COMMA params
-       |
-       ;
-*/
 
 inicial: FUNCTION funcion FUNCTION functionchain main
        | nonempty body;
@@ -93,7 +12,7 @@ funcion: TKN_ID TKN_OPENING_PAR params TKN_CLOSING_PAR RETURNS returnopt nonempt
 
 main: MAIN TKN_OPENING_PAR TKN_CLOSING_PAR RETURNS NOTHING nonempty body;
 
-returnopt: vardeclaration nothing;
+returnopt: vardeclaration NOTHING;
 
 type : INTEGER
      | FLOAT;
@@ -106,8 +25,169 @@ params_suffix: TKN_COMMA type TKN_ID params_suffix
              |
              ;
 
+body: nonempty
+    |
+    ;
+
+nonempty: vardeclaration body
+              | TKN_ID idcall body
+              | outputstat body
+              | forloop nonempty
+              | whileloop nonempty
+              | ifstatement
+              | srn body
+              ;
+
+vardeclaration: type arrdeclaration TKN_ID ;
+
+arrdeclaration : ARRAY TKN_OPENING_PAR arrdeclarationopt TKN_CLOSING_PAR
+               |
+               ;
+
+arrdeclarationopt: TKN_INT
+                 | TKN_QUESTION_MARK;
+
+idcall: idopt idstuff
+      | TKN_OPENING_PAR arguments TKN_CLOSING_PAR
+      |
+      ;
+
+idstuff: TKN_ASSIGN assignation;
+
+idopt: arrpos
+     | dotsize
+     |
+     ;
+
+dotsize: TKN_PERIOD SIZE;
+
+arrpos: TKN_CLOSING_BRA expression TKN_CLOSING_BRA;
+
+arguments: expression arguments_suffix
+         |
+         ;
+
+arguments_suffix: TKN_COMMA expression arguments_suffix
+                |
+                ;
+
+assignation: expression
+           | inputstat;
+
+inputstat: GET NEXT INPUT;
+
+outputstat: PUT outputopt TO OUTPUT outputending;
+
+outputopt: TKN_STR
+         | expression;
+
+outputending: WITH expression DECIMAL PLACES
+            |
+            ;
+
+ifstatement: IF boolexpr nonempty body elseifstat;
+
+elseifstat: ELSEIF boolexpr nonempty body elseifstat elsestatement
+          | elsestatement
+          |
+          ;
+
+elsestatement: ELSE nonempty body
+             |
+             ;
+
+whileloop: WHILE boolexpr;
+
+forloop: FOR TKN_ID idopt idstuff TKN_SEMICOLON boolexpr  TKN_SEMICOLON TKN_ID idopt idstuff;
+
+number: TKN_INT
+      | TKN_FLOAT;
 
 
+expression: expression1 expression_suffix;
+expression_suffix: TKN_MINUS expression1 expression_suffix
+                 | TKN_PLUS expression1 expression_suffix
+                 |
+                 ;
+expression1: plusneg expression2 expression1_suffix;
+expression1_suffix: aritm plusneg expression2 expression1_suffix
+                  |
+                  ;
+expression2: TKN_ID idexpropt
+           | number
+           | TKN_OPENING_PAR expression TKN_CLOSING_PAR
+           | builtin;
+
+aritm: TKN_MOD
+     | TKN_DIV
+     | TKN_TIMES;
+
+plusneg: TKN_MINUS
+       | TKN_PLUS
+       |
+       ;
+
+idexpropt: idopt
+         | TKN_OPENING_PAR arguments TKN_CLOSING_PAR
+         |
+         ;
+
+boolexpr: boolexpr1 boolexpr_suffix;
+boolexpr_suffix: OR boolexpr1 boolexpr_suffix
+               |
+               ;
+boolexpr1: boolexpr2 boolexpr1_suffix;
+boolexpr1_suffix: AND boolexpr2 boolexpr1_suffix
+                |
+                ;
+boolexpr2: boolexpr3 boolexpr2_suffix;
+boolexpr2_suffix: equals boolexpr3 boolexpr2_suffix
+                |
+                ;
+boolexpr3: boolexpr4 boolexpr3_suffix;
+boolexpr3_suffix: comparers boolexpr4 boolexpr3_suffix
+                |
+                ;
+boolexpr4: boolexpr5 boolexpr4_suffix;
+boolexpr4_suffix: TKN_MINUS boolexpr5 boolexpr4_suffix
+                | TKN_PLUS boolexpr5 boolexpr4_suffix
+                |
+                ;
+boolexpr5: plusneg boolexpr6 boolexpr5_suffix;
+boolexpr5_suffix: aritm plusneg boolexpr6 boolexpr5_suffix
+                |
+                ;
+boolexpr6: NOT TKN_OPENING_PAR boolexpr TKN_CLOSING_PAR
+         | TKN_OPENING_PAR boolexpr TKN_CLOSING_PAR
+         | builtin
+         | TKN_ID idexpropt
+         | number;
+
+equals: TKN_EQUAL
+      | TKN_NEQ;
+
+comparers: TKN_LESS
+         | TKN_LEQ
+         | TKN_GREATER
+         | TKN_GEQ;
+
+builtin: sqrt
+       | rdm
+       | abs
+       | pow;
+
+sqrt: SQRT TKN_OPENING_PAR expression TKN_CLOSING_PAR;
+
+srn: SRN TKN_OPENING_PAR expression TKN_CLOSING_PAR;
+
+rdm: RAND TKN_OPENING_PAR expression TKN_COMMA expression TKN_CLOSING_PAR;
+
+abs: ABS TKN_OPENING_PAR expression TKN_CLOSING_PAR;
+
+pow: POW TKN_OPENING_PAR expression TKN_COMMA expression TKN_CLOSING_PAR;
+
+
+/*
 grammar = {"S":[["Function","funcion","Function","FunctionChain","main"],["nonempty","body"]],
            "FunctionChain":[["funcion","Function","FunctionChain"],[""]],
            "funcion": [["id","tkn_opening_par","params","tkn_closing_par","returns","returnopt","nonempty","body"]],
@@ -164,14 +244,13 @@ grammar = {"S":[["Function","funcion","Function","FunctionChain","main"],["nonem
            "boolexpr6":[["not","tkn_opening_par","boolexpr","tkn_closing_par"],["tkn_opening_par","boolexpr","tkn_closing_par"],["builtin"],["id","idexpropt"],["number"]],
            "equals":[["tkn_equal"],["tkn_neq"]],
            "comparers":[["tkn_less"],["tkn_leq"],["tkn_greater"],["tkn_geq"]],
-           "operands":[["tkn_minus"],["tkn_plus"],["tkn_mod"],["tkn_div"],["tkn_times"]],
            "builtin":[["sqrt"],["rdm"],["abs"],["pow"]],
            "sqrt":[["SquareRoot","tkn_opening_par","expression","tkn_closing_par"]],
            "srn":[["SeedRandomNumbers","tkn_opening_par","expression","tkn_closing_par"]],
            "rdm":[["RandomNumber","tkn_opening_par","expression","tkn_comma","expression","tkn_closing_par"]],
            "abs":[["AbsoluteValue","tkn_opening_par","expression","tkn_closing_par"]],
            "pow":[["RaiseToPower","tkn_opening_par","expression","tkn_comma","expression","tkn_closing_par"]]
-           }
+           }*/
 /*-----------OPERATORS------------*/
 TKN_ASSIGN :      '=';
 TKN_PERIOD :      '.';
@@ -179,15 +258,15 @@ TKN_COMMA :       ',';
 TKN_SEMICOLON :   ';';
 TKN_CLOSING_BRA : ']';
 TKN_OPENING_BRA:  '[';
-TKN_CLOSING_PAR:  '(';
-TKN_OPENING_PAR:  ')';
+TKN_CLOSING_PAR:  ')';
+TKN_OPENING_PAR:  '(';
 TKN_PLUS:         '+';
 TKN_MINUS:        '-';
 TKN_TIMES:        '*';
 TKN_DIV:          '/';
 TKN_MOD:          '%';
 TKN_EQUAL:        '==';
-TKN_NEQ_:         '!=';
+TKN_NEQ:         '!=';
 TKN_LESS:         '<';
 TKN_LEQ:          '<=';
 TKN_GREATER:      '>';
@@ -231,5 +310,6 @@ PLACES:   'places"';
 TKN_ID : [a-zA-Z][a-zA-Z0-9_]* ;
 TKN_INT : [0-9]+;
 TKN_FLOAT: [0-9]+( | [.][0-9]+);
+TKN_STR: [a-zA-Z][a-zA-Z0-9_]*;
 ESP : [ \t\r\n]+ -> skip ;
-
+LINE_COMMENT: '//' ~[\r\n]* -> skip;
