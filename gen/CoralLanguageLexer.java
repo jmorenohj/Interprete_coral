@@ -1,4 +1,4 @@
-// Generated from /home/jose/IdeaProjects/coral/grammar/CoralLanguage.g4 by ANTLR 4.10.1
+// Generated from /Users/puntored/Desktop/UN/programming_languages/Interprete_coral/grammar/CoralLanguage.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
