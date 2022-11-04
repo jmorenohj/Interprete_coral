@@ -36,6 +36,7 @@ nonempty: vardeclaration body
               | whileloop nonempty
               | ifstatement
               | srn body
+              | expression
               ;
 
 vardeclaration: type arrdeclaration TKN_ID ;
