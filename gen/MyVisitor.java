@@ -198,19 +198,177 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitBoolexpr(CoralLanguageParser.BoolexprContext ctx){
         if(ctx.boolexpr_suffix()!=null){
-
+            Boolean res = (Boolean)visitBoolexpr1(ctx.boolexpr1()) || (Boolean)visitBoolexpr_suffix(ctx.boolexpr_suffix());
+            return (T)res;
         }
-        return null;
+        return visitBoolexpr1(ctx.boolexpr1());
+
     }
 
     @Override
     public T visitBoolexpr_suffix(CoralLanguageParser.Boolexpr_suffixContext ctx){
-        return null;
+        if(ctx.boolexpr_suffix()!=null){
+            Boolean res = (Boolean)visitBoolexpr1(ctx.boolexpr1()) || (Boolean)visitBoolexpr_suffix(ctx.boolexpr_suffix());
+            return (T)res;
+        }
+        return visitBoolexpr1(ctx.boolexpr1());
+
     }
 
     @Override
     public T visitBoolexpr1(CoralLanguageParser.Boolexpr1Context ctx){
+        if(ctx.boolexpr1_suffix()!=null){
+            Boolean res = (Boolean)visitBoolexpr2(ctx.boolexpr2()) || (Boolean)visitBoolexpr1_suffix(ctx.boolexpr1_suffix());
+            return (T)res;
+        }
+        return visitBoolexpr2(ctx.boolexpr2());
+    }
+
+    @Override
+    public T visitBoolexpr1_suffix(CoralLanguageParser.Boolexpr1_suffixContext ctx) {
+        if(ctx.boolexpr1_suffix()!=null){
+            Boolean res = (Boolean)visitBoolexpr2(ctx.boolexpr2()) || (Boolean)visitBoolexpr1_suffix(ctx.boolexpr1_suffix());
+            return (T)res;
+        }
+        return visitBoolexpr2(ctx.boolexpr2());
+    }
+
+    @Override
+    public T visitBoolexpr2(CoralLanguageParser.Boolexpr2Context ctx) {
+        if(ctx.boolexpr2_suffix().equals().TKN_EQUAL()!=null){
+            Boolean res = (Boolean)visitBoolexpr3(ctx.boolexpr3()) == (Boolean)visitBoolexpr2_suffix(ctx.boolexpr2_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr2_suffix().equals().TKN_NEQ()!=null){
+            Boolean res = (Boolean)visitBoolexpr3(ctx.boolexpr3()) != (Boolean)visitBoolexpr2_suffix(ctx.boolexpr2_suffix());
+            return (T)res;
+        }
+        return (T)visitBoolexpr3(ctx.boolexpr3());
+    }
+
+    @Override public T
+    visitBoolexpr2_suffix(CoralLanguageParser.Boolexpr2_suffixContext ctx) {
+        if(ctx.boolexpr2_suffix().equals().TKN_EQUAL()!=null){
+            Boolean res = (Boolean)visitBoolexpr3(ctx.boolexpr3()) == (Boolean)visitBoolexpr2_suffix(ctx.boolexpr2_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr2_suffix().equals().TKN_NEQ()!=null){
+            Boolean res = (Boolean)visitBoolexpr3(ctx.boolexpr3()) != (Boolean)visitBoolexpr2_suffix(ctx.boolexpr2_suffix());
+            return (T)res;
+        }
+        return (T)visitBoolexpr3(ctx.boolexpr3());
+    }
+
+    @Override
+    public T visitBoolexpr3(CoralLanguageParser.Boolexpr3Context ctx) {
+        if(ctx.boolexpr3_suffix().comparers().TKN_LESS()!=null){
+            Boolean res = (Double)visitBoolexpr4(ctx.boolexpr4()) < (Double)visitBoolexpr3_suffix(ctx.boolexpr3_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr3_suffix().comparers().TKN_LEQ()!=null){
+            Boolean res = (Double)visitBoolexpr4(ctx.boolexpr4()) <= (Double)visitBoolexpr3_suffix(ctx.boolexpr3_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr3_suffix().comparers().TKN_GREATER()!=null){
+            Boolean res = (Double)visitBoolexpr4(ctx.boolexpr4()) > (Double)visitBoolexpr3_suffix(ctx.boolexpr3_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr3_suffix().comparers().TKN_GEQ()!=null){
+            Boolean res = (Double)visitBoolexpr4(ctx.boolexpr4()) >= (Double)visitBoolexpr3_suffix(ctx.boolexpr3_suffix());
+            return (T)res;
+        }
+        return (T)visitBoolexpr4(ctx.boolexpr4());
+    }
+
+    @Override
+    public T visitBoolexpr3_suffix(CoralLanguageParser.Boolexpr3_suffixContext ctx) {
+        if(ctx.boolexpr3_suffix().comparers().TKN_LESS()!=null){
+            Boolean res = (Double)visitBoolexpr4(ctx.boolexpr4()) < (Double)visitBoolexpr3_suffix(ctx.boolexpr3_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr3_suffix().comparers().TKN_LEQ()!=null){
+            Boolean res = (Double)visitBoolexpr4(ctx.boolexpr4()) <= (Double)visitBoolexpr3_suffix(ctx.boolexpr3_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr3_suffix().comparers().TKN_GREATER()!=null){
+            Boolean res = (Double)visitBoolexpr4(ctx.boolexpr4()) > (Double)visitBoolexpr3_suffix(ctx.boolexpr3_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr3_suffix().comparers().TKN_GEQ()!=null){
+            Boolean res = (Double)visitBoolexpr4(ctx.boolexpr4()) >= (Double)visitBoolexpr3_suffix(ctx.boolexpr3_suffix());
+            return (T)res;
+        }
+        return (T)visitBoolexpr4(ctx.boolexpr4());
+    }
+
+    @Override
+    public T visitBoolexpr4(CoralLanguageParser.Boolexpr4Context ctx) {
+        if(ctx.boolexpr4_suffix().TKN_MINUS()!=null){
+            Double res = (Double)visitBoolexpr5(ctx.boolexpr5()) - (Double)visitBoolexpr4_suffix(ctx.boolexpr4_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr4_suffix().TKN_PLUS()!=null){
+            Double res = (Double)visitBoolexpr5(ctx.boolexpr5()) + (Double)visitBoolexpr4_suffix(ctx.boolexpr4_suffix());
+            return (T)res;
+        }
+        return visitBoolexpr5(ctx.boolexpr5());
+    }
+
+    @Override
+    public T visitBoolexpr4_suffix(CoralLanguageParser.Boolexpr4_suffixContext ctx) {
+        if(ctx.boolexpr4_suffix().TKN_MINUS()!=null){
+            Double res = (Double)visitBoolexpr5(ctx.boolexpr5()) - (Double)visitBoolexpr4_suffix(ctx.boolexpr4_suffix());
+            return (T)res;
+        }else if(ctx.boolexpr4_suffix().TKN_PLUS()!=null){
+            Double res = (Double)visitBoolexpr5(ctx.boolexpr5()) + (Double)visitBoolexpr4_suffix(ctx.boolexpr4_suffix());
+            return (T)res;
+        }
+        return visitBoolexpr5(ctx.boolexpr5());
+    }
+
+    @Override
+    public T visitBoolexpr5(CoralLanguageParser.Boolexpr5Context ctx) {
+        Double res = (Double)visitBoolexpr6(ctx.boolexpr6());
+        if(ctx.plusneg().TKN_MINUS()!=null)res = -res;
+        if(ctx.boolexpr5_suffix().aritm().TKN_MOD()!=null){
+            res = res % (Double)visitBoolexpr5_suffix(ctx.boolexpr5_suffix());
+        }else if(ctx.boolexpr5_suffix().aritm().TKN_DIV()!=null){
+            res = res / (Double)visitBoolexpr5_suffix(ctx.boolexpr5_suffix());
+        }else if(ctx.boolexpr5_suffix().aritm().TKN_TIMES()!=null){
+            res = res * (Double)visitBoolexpr5_suffix(ctx.boolexpr5_suffix());
+        }
+        return (T)res;
+    }
+
+
+    @Override
+    public T visitBoolexpr5_suffix(CoralLanguageParser.Boolexpr5_suffixContext ctx) {
+        Double res = (Double)visitBoolexpr6(ctx.boolexpr6());
+        if(ctx.plusneg().TKN_MINUS()!=null)res = -res;
+        if(ctx.boolexpr5_suffix().aritm().TKN_MOD()!=null){
+            res = res % (Double)visitBoolexpr5_suffix(ctx.boolexpr5_suffix());
+        }else if(ctx.boolexpr5_suffix().aritm().TKN_DIV()!=null){
+            res = res / (Double)visitBoolexpr5_suffix(ctx.boolexpr5_suffix());
+        }else if(ctx.boolexpr5_suffix().aritm().TKN_TIMES()!=null){
+            res = res * (Double)visitBoolexpr5_suffix(ctx.boolexpr5_suffix());
+        }
+        return (T)res;
+    }
+
+    @Override
+    public T visitBoolexpr6(CoralLanguageParser.Boolexpr6Context ctx) {
+        if(ctx.NOT()!=null){
+            Boolean boolexpr = !(Boolean)visitBoolexpr(ctx.boolexpr());
+            Double res;
+            if(boolexpr)res = 1.0;
+            else res = 0.0;
+            return (T)res;
+        }else if(ctx.builtin()!=null){
+            return visitBuiltin(ctx.builtin());
+        }else if(ctx.number()!=null){
+            return (T)(Double)Double.parseDouble(ctx.number().getText());
+        }else if(ctx.TKN_ID()!=null){
+            System.out.println("Id access");
+        }else{
+            Boolean boolexpr = !(Boolean)visitBoolexpr(ctx.boolexpr());
+            Double res;
+            if(boolexpr)res = 1.0;
+            else res = 0.0;
+            return (T)res;
+        }
         return null;
     }
+
 
 }
