@@ -1,6 +1,11 @@
 // Triángulo de Pascal
-
+float asdfasfd
+integer array(?) userNums
+userNums.size = 8
+userNums[2]=8
+integer array(10) tenUserNums
 integer rows
+rows=200
 integer coef
 integer space
 integer i

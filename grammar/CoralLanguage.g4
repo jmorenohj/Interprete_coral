@@ -30,7 +30,7 @@ body: nonempty
     ;
 
 nonempty: vardeclaration body
-              | TKN_ID idcall body
+              | idcall body
               | outputstat body
               | forloop nonempty
               | whileloop nonempty
@@ -48,9 +48,8 @@ arrdeclaration : ARRAY TKN_OPENING_PAR arrdeclarationopt TKN_CLOSING_PAR
 arrdeclarationopt: TKN_INT
                  | TKN_QUESTION_MARK;
 
-idcall: idopt idstuff
-      | TKN_OPENING_PAR arguments TKN_CLOSING_PAR
-      |
+idcall: TKN_ID idopt idstuff
+      | TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
       ;
 
 idstuff: TKN_ASSIGN assignation;
@@ -62,7 +61,7 @@ idopt: arrpos
 
 dotsize: TKN_PERIOD SIZE;
 
-arrpos: TKN_CLOSING_BRA expression TKN_CLOSING_BRA;
+arrpos: TKN_OPENING_BRA expression TKN_CLOSING_BRA;
 
 arguments: expression arguments_suffix
          |

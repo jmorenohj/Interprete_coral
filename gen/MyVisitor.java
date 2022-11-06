@@ -1,3 +1,5 @@
+import controller.VariableController;
+
 import java.util.HashMap;
 import java.lang.Math;
 public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
@@ -16,10 +18,11 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     public T visitNonempty(CoralLanguageParser.NonemptyContext ctx){
         System.out.println("NonEmpty ");
         if(ctx.vardeclaration()!=null){
-            System.out.println("Vardeclaration "+ctx.vardeclaration().TKN_ID().getText());
+            VariableController.INSTANCE.addFromVardeclarationContext(ctx.vardeclaration());
             visitBody(ctx.body());
         }else if(ctx.idcall()!=null){
             System.out.println("id");
+            System.out.println(ctx.idcall().getText());
             visitBody(ctx.body());
         }else if(ctx.outputstat()!=null){
             System.out.println("Output");
@@ -46,7 +49,6 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
         }
         return null;
     }
-
 
 
     @Override
