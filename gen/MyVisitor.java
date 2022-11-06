@@ -1,5 +1,6 @@
 import controller.VariableController;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.lang.Math;
 public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
@@ -25,7 +26,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
             System.out.println(ctx.idcall().getText());
             visitBody(ctx.body());
         }else if(ctx.outputstat()!=null){
-            System.out.println("Output");
+            visitOutputstat(ctx.outputstat());
             visitBody(ctx.body());
         }else if(ctx.forloop()!=null){
             System.out.println("for");
@@ -52,112 +53,76 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
 
     @Override
-    public T visitExpression(CoralLanguageParser.ExpressionContext ctx){
-        if(ctx.expression_suffix()!=null){
-            Double res = (Double)visitExpression1(ctx.expression1())+(Double)visitExpression_suffix(ctx.expression_suffix());
-            System.out.println(res);
-            return (T)res;
-
-        }else {
-            return visitExpression1(ctx.expression1());
+    public T visitOutputstat(CoralLanguageParser.OutputstatContext ctx){
+        if(ctx.outputopt().TKN_STR()!=null){
+            System.out.println(ctx.outputopt().TKN_STR().getText());
+        }else{
+            Double res = (Double)visitExpression(ctx.outputopt().expression());
+            NumberFormat nf = NumberFormat.getInstance();
+            if(ctx.outputending().expression()!=null){
+                Integer places = (Integer)(int)(double)(Double)visitExpression(ctx.outputending().expression());
+                nf.setMaximumFractionDigits(places);
+                System.out.println(nf.format(res));
+            }else{
+                nf.setMaximumFractionDigits(0);
+                System.out.println(nf.format(res));
+            }
         }
+        return null;
+    }
+
+    @Override
+    public T visitExpression(CoralLanguageParser.ExpressionContext ctx){
+        Double res = (Double) visitExpression1(ctx.expression1());
+        if(ctx.expression_suffix().TKN_MINUS()!=null) {
+            res = res - (Double)visitExpression_suffix(ctx.expression_suffix());
+        }else if(ctx.expression_suffix().TKN_PLUS()!=null){
+            res = res + (Double)visitExpression_suffix(ctx.expression_suffix());
+        }
+        return (T)res;
+
     }
 
     @Override
     public T visitExpression_suffix(CoralLanguageParser.Expression_suffixContext ctx){
-        if(ctx.expression_suffix()!=null){
-            Double res;
-            if(ctx.TKN_MINUS()!=null){
-                res = -(Double)visitExpression1(ctx.expression1()) + (Double)visitExpression_suffix(ctx.expression_suffix());
-            }else{
-                res = (Double)visitExpression1(ctx.expression1()) + (Double)visitExpression_suffix(ctx.expression_suffix());
-            }
-            return (T)res;
-        }else{
-            Double res;
-            if(ctx.TKN_MINUS()!=null){
-                res = -(Double)visitExpression1(ctx.expression1()) ;
-            }else{
-                res = (Double)visitExpression1(ctx.expression1())  ;
-            }
-            return (T)res;
+        Double res = (Double) visitExpression1(ctx.expression1());
+        if(ctx.expression_suffix().TKN_MINUS()!=null) {
+            res = res - (Double)visitExpression_suffix(ctx.expression_suffix());
+        }else if(ctx.expression_suffix().TKN_MINUS()!=null){
+            res = res - (Double)visitExpression_suffix(ctx.expression_suffix());
         }
+        return (T)res;
     }
 
     @Override
     public T visitExpression1(CoralLanguageParser.Expression1Context ctx){
-        if(ctx.expression1_suffix()!=null){
-            Double res;
-            if(ctx.expression1_suffix().aritm().TKN_DIV()!=null){
-                if(ctx.plusneg().TKN_MINUS()!=null){
-                    res = -(Double)visitExpression2(ctx.expression2())/(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }else{
-                    res = (Double)visitExpression2(ctx.expression2())/(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }
-            }else if(ctx.expression1_suffix().aritm().TKN_MOD()!=null){
-                if(ctx.plusneg().TKN_MINUS()!=null){
-                    res = -(Double)visitExpression2(ctx.expression2())%(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }else{
-                    res = (Double)visitExpression2(ctx.expression2())%(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }
-            }else if(ctx.expression1_suffix().aritm().TKN_TIMES()!=null){
-                if(ctx.plusneg().TKN_MINUS()!=null){
-                    res = -(Double)visitExpression2(ctx.expression2())*(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }else{
-                    res = (Double)visitExpression2(ctx.expression2())*(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }
-            }else{
-                res = 0.0;
-            }
-
-            return (T)res;
-        }else{
-            Double res;
-            if(ctx.plusneg().TKN_MINUS()!=null){
-                res = -(Double)visitExpression2(ctx.expression2());
-            }else{
-                res = (Double)visitExpression2(ctx.expression2());
-            }
-            return (T)res;
+        Double res = (Double)visitExpression2(ctx.expression2());
+        if(ctx.plusneg().TKN_MINUS()!=null) res = -res;
+        if(ctx.expression1_suffix().aritm()==null)return (T)res;
+        if(ctx.expression1_suffix().aritm().TKN_DIV()!=null){
+            res = res/(Double)visitExpression1_suffix(ctx.expression1_suffix());
+        }else if(ctx.expression1_suffix().aritm().TKN_MOD()!=null){
+            res = res%(Double)visitExpression1_suffix(ctx.expression1_suffix());
+        }else if(ctx.expression1_suffix().aritm().TKN_TIMES()!=null){
+            res = res*(Double)visitExpression1_suffix(ctx.expression1_suffix());
         }
+        return (T)res;
+
     }
 
     @Override
     public T visitExpression1_suffix(CoralLanguageParser.Expression1_suffixContext ctx){
-        if(ctx.expression1_suffix()!=null){
-            Double res;
-            if(ctx.expression1_suffix().aritm().TKN_DIV()!=null){
-                if(ctx.plusneg().TKN_MINUS()!=null){
-                    res = -(Double)visitExpression2(ctx.expression2())/(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }else{
-                    res = (Double)visitExpression2(ctx.expression2())/(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }
-            }else if(ctx.expression1_suffix().aritm().TKN_MOD()!=null){
-                if(ctx.plusneg().TKN_MINUS()!=null){
-                    res = -(Double)visitExpression2(ctx.expression2())%(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }else{
-                    res = (Double)visitExpression2(ctx.expression2())%(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }
-            }else if(ctx.expression1_suffix().aritm().TKN_TIMES()!=null){
-                if(ctx.plusneg().TKN_MINUS()!=null){
-                    res = -(Double)visitExpression2(ctx.expression2())*(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }else{
-                    res = (Double)visitExpression2(ctx.expression2())*(Double)visitExpression1_suffix(ctx.expression1_suffix());
-                }
-            }else{
-                res = 0.0;
-            }
-
-            return (T)res;
-        }else{
-            Double res;
-            if(ctx.plusneg().TKN_MINUS()!=null){
-                res = -(Double)visitExpression2(ctx.expression2());
-            }else{
-                res = (Double)visitExpression2(ctx.expression2());
-            }
-            return (T)res;
+        Double res = (Double)visitExpression2(ctx.expression2());
+        if(ctx.plusneg().TKN_MINUS()!=null) res = -res;
+        if(ctx.expression1_suffix().aritm()==null)return (T)res;
+        if(ctx.expression1_suffix().aritm().TKN_DIV()!=null){
+            res = res/(Double)visitExpression1_suffix(ctx.expression1_suffix());
+        }else if(ctx.expression1_suffix().aritm().TKN_MOD()!=null){
+            res = res%(Double)visitExpression1_suffix(ctx.expression1_suffix());
+        }else if(ctx.expression1_suffix().aritm().TKN_TIMES()!=null){
+            res = res*(Double)visitExpression1_suffix(ctx.expression1_suffix());
         }
+        return (T)res;
     }
     @Override
     public T visitExpression2(CoralLanguageParser.Expression2Context ctx){

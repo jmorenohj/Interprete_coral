@@ -1,4 +1,4 @@
-// Generated from /Users/puntored/Desktop/UN/programming_languages/Interprete_coral/grammar/CoralLanguage.g4 by ANTLR 4.10.1
+// Generated from /home/jose/Documentos/Entrega3Lenguajes/Interprete_coral/grammar/CoralLanguage.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -67,7 +67,7 @@ public class CoralLanguageParser extends Parser {
 			"'elseif'", "'else'", "'while'", "'for'", "'integer'", "'float'", "'array'", 
 			"'Function'", "'returns'", "'size'", "'Main'", "'or'", "'and'", "'nothing'", 
 			"'not'", "'SeedRandomNumbers'", "'AbsoluteValue'", "'SquareRoot'", "'RaiseToPower'", 
-			"'RandomNumber'", "'with'", "'decimal'", "'places\"'"
+			"'RandomNumber'", "'with'", "'decimal'", "'places'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();

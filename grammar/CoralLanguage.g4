@@ -304,7 +304,7 @@ POW:      'RaiseToPower';
 RAND:     'RandomNumber';
 WITH:     'with';
 DECIMAL:  'decimal';
-PLACES:   'places"';
+PLACES:   'places';
 /*-----------RESERVED WORDS-------*/
 
 TKN_ID : [a-zA-Z][a-zA-Z0-9_]* ;
