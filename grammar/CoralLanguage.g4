@@ -127,8 +127,8 @@ plusneg: TKN_MINUS
        |
        ;
 
-idexpropt: idopt
-         | TKN_OPENING_PAR arguments TKN_CLOSING_PAR
+idexpropt: TKN_ID idopt
+         | TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
          |
          ;
 

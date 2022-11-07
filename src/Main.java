@@ -2,8 +2,6 @@ import controller.VariableController;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-import java.text.NumberFormat;
-
 public class Main {
     public static void main(String[] args) throws Exception{
         CoralLanguageLexer lexer = new CoralLanguageLexer(CharStreams.fromFileName("input/in.txt"));
@@ -14,7 +12,3 @@ public class Main {
         loader.visit(tree);
     }
 }
-
-
-
-

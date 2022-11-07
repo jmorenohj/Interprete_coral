@@ -51,8 +51,11 @@ data class Variable constructor(val type: DataTypes, val name: String, var value
             } catch (e: IndexOutOfBoundsException) {
                 println("Error no contiene el elemento $index")
                 exitProcess(-1)
+            } finally {
+                return
             }
         }
+
         println("Error $type no es una lista")
         exitProcess(-1)
     }
@@ -61,11 +64,7 @@ data class Variable constructor(val type: DataTypes, val name: String, var value
         when (this.type) {
             DataTypes.INTEGER -> {
                 try {
-                    value.toString().toInt()
-                    if (value !is Int) {
-                        println("Error de tipos, se esperaba un entero")
-                        exitProcess(-1)
-                    }
+                    this.value=value.toString().toDouble().toInt()
                 } catch (e: NumberFormatException) {
                     println("Error de tipos, se esperaba un entero")
                     exitProcess(-1)
@@ -74,11 +73,7 @@ data class Variable constructor(val type: DataTypes, val name: String, var value
 
             DataTypes.FLOAT -> {
                 try {
-                    value.toString().toDouble()
-                    if (value !is Float && value !is Int) {
-                        println("Error de tipos, se esperaba un float")
-                        exitProcess(-1)
-                    }
+                    this.value.toString().toDouble()
                 } catch (e: NumberFormatException) {
                     println("Error de tipos, se esperaba un float")
                     exitProcess(-1)
@@ -86,11 +81,11 @@ data class Variable constructor(val type: DataTypes, val name: String, var value
             }
 
             DataTypes.ARRAY_INT -> {
-
+                this.value=value
             }
 
             DataTypes.ARRAY_FLOAT -> {
-
+                this.value=value
             }
         }
         return Variable(this.type, this.name, value)

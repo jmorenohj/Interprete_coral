@@ -1,6 +1,3 @@
-while RandomNumber(0,30)<=29
-    Put RandomNumber(0,30) to output
-// Triángulo de Pascal
 float asdfasfd
 integer rows
 integer array(?) userNums
@@ -13,7 +10,16 @@ integer space
 integer i
 integer j
 
-rows = 8
+rows = asd + 8
+
+Put 12+213123+148-1 to output
+
+while RandomNumber(0,30)<=29
+    Put RandomNumber(0,30) to output
+// Triángulo de Pascal
+
+
+
 
 for i = 0; i < rows; i = i + 1
 

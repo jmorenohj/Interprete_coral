@@ -6,10 +6,12 @@ import models.ExceptionInter
 import models.Variable
 import kotlin.system.exitProcess
 
-enum class  AssignVariableStrategy{DOT_SIZE, ARR_POSITION, ONLY_VALUE }
+enum class AssignVariableStrategy { DOT_SIZE, ARR_POSITION, ONLY_VALUE }
 
 object VariableController {
     private const val globalScope = "Global"
+    var strategy = AssignVariableStrategy.ONLY_VALUE
+    var currentVar: Variable? = null
 
     // Mapa de mapas donde el mapa general es un mapa de scopes
     private val scopes: HashMap<String, HashMap<String, Variable>> = HashMap()
@@ -23,39 +25,6 @@ object VariableController {
             return ctx.arrdeclarationopt().TKN_INT().text.toInt()
         }
         return null
-    }
-
-    fun assignFromVariableContext(ctx: CoralLanguageParser.IdcallContext) {
-        // Check if variable exists
-        println(ctx.text);
-        val currentVar = ctx.TKN_ID().text
-        getVariable(currentVar)
-        //CHECK STRATEGY
-        if (ctx.TKN_OPENING_PAR() == null) {
-            var strategy=AssignVariableStrategy.ONLY_VALUE
-            //WHEN IS A VAR
-            if (ctx.idopt().text.isNotEmpty()) {
-                // WHEN IS ACCESSING INTO AN ARR POSITION OR DOT_SIZE
-                if (ctx.idopt().arrpos().text.isNotEmpty()) {
-                    //WHEN IS ACCESSING INTO AN ARRPOSITION
-                    strategy=AssignVariableStrategy.ARR_POSITION
-                    ctx.idopt().arrpos().expression()
-                } else {
-                    //WHEN IS ACCESSING INTO A DOT_SIZE
-                    strategy=AssignVariableStrategy.DOT_SIZE
-                }
-                print("IDOPT ")
-                println(ctx.idopt().text)
-            }
-            //ASSIGNATION VALUE
-            print("ASSIGNATION ")
-            println(ctx.idstuff().assignation().text)
-        } else {
-            //WHEN IS A CALL FUNCTION
-            println(ctx.TKN_CLOSING_PAR())
-            println(ctx.arguments())
-            println(ctx.TKN_CLOSING_PAR())
-        }
     }
 
     fun addFromVardeclarationContext(ctx: CoralLanguageParser.VardeclarationContext) {
@@ -129,5 +98,52 @@ object VariableController {
         }
         print("$varName no ha sido declarado")
         exitProcess(-1)
+    }
+
+    fun getVariable(varName: String): Variable {
+        val scope = getScope(globalScope)
+        if (scope.containsKey(varName)) {
+            return scope[varName]!!
+        }
+        print("$varName no ha sido declarado")
+        exitProcess(-1)
+    }
+
+    fun setVariable(varName: String, value: Any?, scopeName: String) {
+        var variable = getVariable(varName, scopeName)
+        variable = variable.copyWithValue(value)
+        val scope = getScope(scopeName)
+        scope[varName] = variable
+    }
+
+    fun setVariable(varName: String, value: Any?) {
+        var variable = getVariable(varName, globalScope)
+        variable = variable.copyWithValue(value)
+        val scope = getScope(globalScope)
+        scope[varName] = variable
+    }
+
+    fun setArraySize(varName: String, size: Int, scopeName: String) {
+        val variable = getVariable(varName, scopeName)
+        variable.copyWithValue(MutableList<Number>(size) { 0 })
+        val scope = getScope(scopeName)
+        scope[varName] = variable
+    }
+
+    fun setArraySize(varName: String, size: Int) {
+        val variable = getVariable(varName, globalScope)
+        variable.copyWithValue(MutableList<Number>(size) { 0 })
+        val scope = getScope(globalScope)
+        scope[varName] = variable
+    }
+
+    fun setArrayElement(varName: String, pos: Int, value: Double) {
+        val variable = getVariable(varName, globalScope)
+        variable.setArrayElement(pos, value)
+    }
+
+    fun setArrayElement(varName: String, pos: Int, value: Double, scopeName: String) {
+        val variable = getVariable(varName, scopeName)
+        variable.setArrayElement(pos, value)
     }
 }
