@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.tree.*;
 
 public class Main {
     public static void main(String[] args) throws Exception{
-        boolean isJoselito=true;
+        boolean isJoselito=!true;
         String file;
         if(isJoselito){
             file="input/in1.txt";

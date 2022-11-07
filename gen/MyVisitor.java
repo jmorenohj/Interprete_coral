@@ -38,8 +38,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
             visitOutputstat(ctx.outputstat());
             visitBody(ctx.body());
         } else if (ctx.forloop() != null) {
-            //visitForloop(ctx.forloop());
-            visitBody(ctx.body());
+            visitForloop(ctx.forloop());
         } else if (ctx.whileloop() != null) {
             System.out.println("While");
             visitWhileloop(ctx.whileloop());
@@ -56,7 +55,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     public T visitForloop(CoralLanguageParser.ForloopContext ctx) {
         System.out.println("##### FOR LOOP #####");
         System.out.println(ctx.getText());
-        return visitChildren(ctx);
+        return null;
     }
 
     @Override
@@ -163,7 +162,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitExpression1(CoralLanguageParser.Expression1Context ctx) {
-        Double res = (Double) visitExpression2(ctx.expression2());
+        Double res = Double.parseDouble(visitExpression2(ctx.expression2()).toString());
         if (ctx.plusneg().TKN_MINUS() != null) res = -res;
         if (ctx.expression1_suffix().aritm() == null) return (T) res;
         if (ctx.expression1_suffix().aritm().TKN_DIV() != null) {

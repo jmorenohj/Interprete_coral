@@ -36,6 +36,7 @@ nonempty: vardeclaration body
               | whileloop
               | ifstatement
               | srn body
+              | expression
               ;
 
 vardeclaration: type arrdeclaration TKN_ID ;
@@ -97,7 +98,7 @@ elsestatement: ELSE nonempty body
 
 whileloop: WHILE boolexpr nonempty;
 
-forloop: FOR TKN_ID idstuff TKN_SEMICOLON boolexpr TKN_SEMICOLON TKN_ID idstuff nonempty;
+forloop: FOR TKN_ID idstuff TKN_SEMICOLON boolexpr  TKN_SEMICOLON TKN_ID idstuff;
 
 number: TKN_INT
       | TKN_FLOAT;
@@ -112,7 +113,6 @@ expression1: plusneg expression2 expression1_suffix;
 expression1_suffix: aritm plusneg expression2 expression1_suffix
                   |
                   ;
-
 expression2: idexpropt
            | number
            | TKN_OPENING_PAR expression TKN_CLOSING_PAR
@@ -129,6 +129,7 @@ plusneg: TKN_MINUS
 
 idexpropt: TKN_ID idopt
          | TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
+         | idopt
          ;
 
 boolexpr: boolexpr1 boolexpr_suffix;
