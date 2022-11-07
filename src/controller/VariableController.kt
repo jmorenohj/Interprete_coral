@@ -6,6 +6,8 @@ import models.ExceptionInter
 import models.Variable
 import kotlin.system.exitProcess
 
+enum class  AssignVariableStrategy{DOT_SIZE, ARR_POSITION, ONLY_VALUE }
+
 object VariableController {
     private const val globalScope = "Global"
 
@@ -16,13 +18,45 @@ object VariableController {
         createScope(globalScope)
     }
 
-    fun getArrayLength(ctx: CoralLanguageParser.ArrdeclarationContext): Int?{
-        if(ctx.arrdeclarationopt().TKN_INT()!=null){
+    fun getArrayLength(ctx: CoralLanguageParser.ArrdeclarationContext): Int? {
+        if (ctx.arrdeclarationopt().TKN_INT() != null) {
             return ctx.arrdeclarationopt().TKN_INT().text.toInt()
         }
         return null
     }
 
+    fun assignFromVariableContext(ctx: CoralLanguageParser.IdcallContext) {
+        // Check if variable exists
+        println(ctx.text);
+        val currentVar = ctx.TKN_ID().text
+        getVariable(currentVar)
+        //CHECK STRATEGY
+        if (ctx.TKN_OPENING_PAR() == null) {
+            var strategy=AssignVariableStrategy.ONLY_VALUE
+            //WHEN IS A VAR
+            if (ctx.idopt().text.isNotEmpty()) {
+                // WHEN IS ACCESSING INTO AN ARR POSITION OR DOT_SIZE
+                if (ctx.idopt().arrpos().text.isNotEmpty()) {
+                    //WHEN IS ACCESSING INTO AN ARRPOSITION
+                    strategy=AssignVariableStrategy.ARR_POSITION
+                    ctx.idopt().arrpos().expression()
+                } else {
+                    //WHEN IS ACCESSING INTO A DOT_SIZE
+                    strategy=AssignVariableStrategy.DOT_SIZE
+                }
+                print("IDOPT ")
+                println(ctx.idopt().text)
+            }
+            //ASSIGNATION VALUE
+            print("ASSIGNATION ")
+            println(ctx.idstuff().assignation().text)
+        } else {
+            //WHEN IS A CALL FUNCTION
+            println(ctx.TKN_CLOSING_PAR())
+            println(ctx.arguments())
+            println(ctx.TKN_CLOSING_PAR())
+        }
+    }
 
     fun addFromVardeclarationContext(ctx: CoralLanguageParser.VardeclarationContext) {
         val type = ctx.type().text
@@ -32,12 +66,12 @@ object VariableController {
             addVariable(id, type.uppercase(), null)
             println(getVariable(id))
         } else {
-            val length=getArrayLength(ctx.arrdeclaration())
-            val typeEnum=if (type=="integer") "ARRAY_INT" else "ARRAY_FLOAT"
-            if(length==null){
+            val length = getArrayLength(ctx.arrdeclaration())
+            val typeEnum = if (type == "integer") "ARRAY_INT" else "ARRAY_FLOAT"
+            if (length == null) {
                 addVariable(id, typeEnum, null)
-            }else{
-                val list= MutableList<Number>(length){0}
+            } else {
+                val list = MutableList<Number>(length) { 0 }
                 addVariable(id, typeEnum, list)
             }
             println(getVariable(id))

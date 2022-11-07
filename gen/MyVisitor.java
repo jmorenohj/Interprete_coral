@@ -22,8 +22,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
             VariableController.INSTANCE.addFromVardeclarationContext(ctx.vardeclaration());
             visitBody(ctx.body());
         }else if(ctx.idcall()!=null){
-            System.out.println("id");
-            System.out.println(ctx.idcall().getText());
+            VariableController.INSTANCE.assignFromVariableContext(ctx.idcall());
             visitBody(ctx.body());
         }else if(ctx.outputstat()!=null){
             visitOutputstat(ctx.outputstat());
