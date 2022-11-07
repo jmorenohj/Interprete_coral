@@ -1,1 +1,2 @@
-Put RandomNumber(0, 5) to output
+while RandomNumber(0,30)<=29
+    Put RandomNumber(0,30) to output

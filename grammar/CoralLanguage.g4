@@ -33,7 +33,7 @@ nonempty: vardeclaration body
               | idcall body
               | outputstat body
               | forloop nonempty
-              | whileloop nonempty
+              | whileloop
               | ifstatement
               | srn body
               | expression
@@ -96,7 +96,7 @@ elsestatement: ELSE nonempty body
              |
              ;
 
-whileloop: WHILE boolexpr;
+whileloop: WHILE boolexpr nonempty;
 
 forloop: FOR TKN_ID idopt idstuff TKN_SEMICOLON boolexpr  TKN_SEMICOLON TKN_ID idopt idstuff;
 
