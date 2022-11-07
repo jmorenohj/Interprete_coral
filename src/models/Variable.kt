@@ -3,18 +3,19 @@ package models
 import java.lang.NumberFormatException
 import kotlin.system.exitProcess
 
-enum class DataTypes { INTEGER, FLOAT, ARRAY_INT, ARRAY_FLOAT }
+enum class DataTypes { INTEGER, FLOAT, ARRAY_INT, ARRAY_FLOAT, FUNCTION }
 
 data class Variable constructor(val type: DataTypes, val name: String, var value: Any?) {
     constructor(type: String, name: String, value: Any?) : this(DataTypes.valueOf(type), name, value)
 
-    init{
-        if(this.value==null){
-            when (this.type){
-                DataTypes.INTEGER -> this.value=0
-                DataTypes.FLOAT -> this.value=0.0
+    init {
+        if (this.value == null) {
+            when (this.type) {
+                DataTypes.INTEGER -> this.value = 0
+                DataTypes.FLOAT -> this.value = 0.0
                 DataTypes.ARRAY_INT -> null
                 DataTypes.ARRAY_FLOAT -> null
+                DataTypes.FUNCTION -> null
             }
         }
     }
@@ -64,7 +65,7 @@ data class Variable constructor(val type: DataTypes, val name: String, var value
         when (this.type) {
             DataTypes.INTEGER -> {
                 try {
-                    this.value=value.toString().toDouble().toInt()
+                    this.value = value.toString().toDouble().toInt()
                 } catch (e: NumberFormatException) {
                     println("Error de tipos, se esperaba un entero")
                     exitProcess(-1)
@@ -81,11 +82,26 @@ data class Variable constructor(val type: DataTypes, val name: String, var value
             }
 
             DataTypes.ARRAY_INT -> {
-                this.value=value
+                if (this.value != null) {
+                    println("Error, ya se ha declarado el tamaño del arreglo")
+                    exitProcess(-1)
+                }
+                this.value = value
             }
 
             DataTypes.ARRAY_FLOAT -> {
-                this.value=value
+                if (this.value != null) {
+                    println("Error, ya se ha declarado el tamaño del arreglo")
+                    exitProcess(-1)
+                }
+                this.value = value
+            }
+            DataTypes.FUNCTION->{
+                if(this.value != null){
+                    println("Error, ya se ha declarado esta función")
+                    exitProcess(-1)
+                }
+                this.value = value
             }
         }
         return Variable(this.type, this.name, value)

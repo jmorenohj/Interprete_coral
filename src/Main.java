@@ -4,7 +4,14 @@ import org.antlr.v4.runtime.tree.*;
 
 public class Main {
     public static void main(String[] args) throws Exception{
-        CoralLanguageLexer lexer = new CoralLanguageLexer(CharStreams.fromFileName("input/in.txt"));
+        boolean isJoselito=true;
+        String file;
+        if(isJoselito){
+            file="input/in1.txt";
+        }else{
+            file="input/in.txt";
+        }
+        CoralLanguageLexer lexer = new CoralLanguageLexer(CharStreams.fromFileName(file));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         CoralLanguageParser parser = new CoralLanguageParser(tokens);
         ParseTree tree = parser.inicial();

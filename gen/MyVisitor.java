@@ -8,22 +8,26 @@ import java.util.HashMap;
 import java.lang.Math;
 
 public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
-    HashMap<String, Object> table = new HashMap<>();
+
     Scanner scanner = new Scanner(System.in);
 
     @Override
     public T visitInicial(CoralLanguageParser.InicialContext ctx) {
         if (ctx.funcion() != null) {
-            System.out.println("Función");
+            CoralLanguageParser.FunctionchainContext funChain = ctx.functionchain();
+            VariableController.INSTANCE.addVariable(ctx.funcion().TKN_ID().getText(),"FUNCTION",ctx.funcion());
+            while(funChain.FUNCTION()!=null){
+                VariableController.INSTANCE.addVariable(funChain.funcion().TKN_ID().getText(),"FUNCTION",funChain.funcion());
+                funChain = funChain.functionchain();
+            }
+            return visitMain(ctx.main());
         } else {
             return visitChildren(ctx);
         }
-        return null;
     }
 
     @Override
     public T visitNonempty(CoralLanguageParser.NonemptyContext ctx) {
-        System.out.println("NonEmpty ");
         if (ctx.vardeclaration() != null) {
             VariableController.INSTANCE.addFromVardeclarationContext(ctx.vardeclaration());
             visitBody(ctx.body());
@@ -34,8 +38,8 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
             visitOutputstat(ctx.outputstat());
             visitBody(ctx.body());
         } else if (ctx.forloop() != null) {
-            System.out.println("for");
-            visitNonempty(ctx.nonempty());
+            //visitForloop(ctx.forloop());
+            visitBody(ctx.body());
         } else if (ctx.whileloop() != null) {
             System.out.println("While");
             visitWhileloop(ctx.whileloop());
@@ -49,8 +53,14 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     }
 
     @Override
-    public T visitIdcall(CoralLanguageParser.IdcallContext ctx) {
+    public T visitForloop(CoralLanguageParser.ForloopContext ctx) {
+        System.out.println("##### FOR LOOP #####");
         System.out.println(ctx.getText());
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public T visitIdcall(CoralLanguageParser.IdcallContext ctx) {
         String currentVarName = ctx.TKN_ID().getText();
         Variable var = VariableController.INSTANCE.getVariable(currentVarName);
         if (ctx.TKN_OPENING_PAR() == null) {
@@ -76,24 +86,18 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
                 valueToAssign = scanner.nextDouble();
             }
             switch (strategy) {
-                case DOT_SIZE:
-                    VariableController.INSTANCE.setArraySize(currentVarName, valueToAssign.intValue());
-                    break;
-                case ARR_POSITION:
-                    VariableController.INSTANCE.setArrayElement(currentVarName, arrPosition, valueToAssign.intValue());
-                    break;
-                case ONLY_VALUE:
-                    VariableController.INSTANCE.setVariable(currentVarName, valueToAssign);
-                    break;
+                case DOT_SIZE -> VariableController.INSTANCE.setArraySize(currentVarName, valueToAssign.intValue());
+                case ARR_POSITION ->
+                        VariableController.INSTANCE.setArrayElement(currentVarName, arrPosition, valueToAssign.intValue());
+                case ONLY_VALUE -> VariableController.INSTANCE.setVariable(currentVarName, valueToAssign);
             }
-
+            System.out.println(VariableController.INSTANCE.getVariable(currentVarName));
         } else {
             //WHEN IS A CALL FUNCTION
             System.out.println(ctx.TKN_CLOSING_PAR());
             System.out.println(ctx.arguments());
             System.out.println(ctx.TKN_CLOSING_PAR());
         }
-        System.out.println(ctx.getText());
         return visitChildren(ctx);
     }
 
@@ -118,7 +122,6 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
                 nf.setMaximumFractionDigits(places);
                 System.out.println(nf.format(res));
             } else {
-                System.out.println(res.toString());
                 nf.setMaximumFractionDigits(0);
                 System.out.println(nf.format(res));
             }
@@ -132,8 +135,6 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
         while ((Boolean) visitBoolexpr(ctx.boolexpr())) {
             visitNonempty(ctx.nonempty());
         }
-
-
         return null;
     }
 
@@ -192,7 +193,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitExpression2(CoralLanguageParser.Expression2Context ctx) {
-        if (ctx.idexpropt() != null) {
+        if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID()!=null ) {
             return (T) VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText()).getValue();
         } else if (ctx.number() != null) {
             return (T) (Double) Double.parseDouble(ctx.number().getText());

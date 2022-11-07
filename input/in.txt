@@ -10,13 +10,9 @@ integer space
 integer i
 integer j
 
-rows = asd + 8
-
-Put 12+213123+148-1 to output
-
-while RandomNumber(0,30)<=29
-    Put RandomNumber(0,30) to output
-// Triángulo de Pascal
+rows = rows + 7
+for space = 1; space <= rows-i; space = space + 1
+      Put rows to output
 
 
 
