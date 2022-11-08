@@ -148,4 +148,12 @@ object VariableController {
         val variable = getVariable(varName, scopeName)
         variable.setArrayElement(pos, value)
     }
+
+    fun scopeContainsVariable(varName: String, scopeName:String):Boolean{
+        var scope = getScope(scopeName)
+        if(scope.containsKey(varName)){
+            return true;
+        }
+        return false;
+    }
 }

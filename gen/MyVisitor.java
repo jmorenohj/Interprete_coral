@@ -42,17 +42,22 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     }
 
     @Override
-    public T visitFuncion(CoralLanguageParser.FuncionContext ctx) {
-        VariableController.INSTANCE.createScope(ctx.TKN_ID().getText());
-        Boolean returns = ctx.returnopt().NOTHING() == null;
+    public T visitFuncion(CoralLanguageParser.FuncionContext ctx){
+        Boolean returns = ctx.returnopt().NOTHING()==null;
         String returnVarName;
         Variable returnVar;
         if (returns) {
             returnVarName = ctx.returnopt().vardeclaration().TKN_ID().getText();
-            VariableController.INSTANCE.addVariable(returnVarName, ctx.returnopt().vardeclaration().type().getText(), null, ctx.TKN_ID().getText());
-            returnVar = VariableController.INSTANCE.getVariable(returnVarName, ctx.TKN_ID().getText());
+            VariableController.INSTANCE.addVariable(returnVarName,ctx.returnopt().vardeclaration().type().getText(),null,ctx.TKN_ID().getText());
+            visitNonempty(ctx.nonempty());
+            visitBody(ctx.body());
+            returnVar = VariableController.INSTANCE.getVariable(returnVarName,ctx.TKN_ID().getText());
+            StackController.INSTANCE.removeScope();
+            return (T)returnVar.getValue();
         }
         visitNonempty(ctx.nonempty());
+        visitBody(ctx.body());
+        StackController.INSTANCE.removeScope();
         return null;
     }
 
@@ -61,7 +66,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
         if (ctx == null) {
             return null;
         } else if (ctx.vardeclaration() != null) {
-            VariableController.INSTANCE.addFromStackContext(ctx.vardeclaration(), StackController.INSTANCE.getScope());
+            VariableController.INSTANCE.addFromStackContext(ctx.vardeclaration(),StackController.INSTANCE.getScope());
             visitBody(ctx.body());
         } else if (ctx.idcall() != null) {
             visitIdcall(ctx.idcall());
@@ -140,7 +145,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitIdcall(CoralLanguageParser.IdcallContext ctx) {
         String currentVarName = ctx.TKN_ID().getText();
-        Variable var = VariableController.INSTANCE.getVariable(currentVarName);
+        Variable var = VariableController.INSTANCE.getVariable(currentVarName,StackController.INSTANCE.getScope());
         if (ctx.arguments() == null) {
             AssignVariableStrategy strategy = AssignVariableStrategy.ONLY_VALUE;
             Integer arrPosition = null;
@@ -273,13 +278,30 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitExpression2(CoralLanguageParser.Expression2Context ctx) {
-        if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID() != null) {
-            Variable variable = VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText());
-            if (variable.getType() == DataTypes.FUNCTION) {
-                CoralLanguageParser.FuncionContext func = (CoralLanguageParser.FuncionContext) variable.getValue();
+        if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID()!=null ) {
+            if(VariableController.INSTANCE.scopeContainsVariable(ctx.idexpropt().TKN_ID().getText(),"Global")){
+                Variable variable = VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText(),StackController.INSTANCE.getScope());
+                CoralLanguageParser.FuncionContext func = (CoralLanguageParser.FuncionContext)variable.getValue();
+                String scope = func.TKN_ID().getText();
+                CoralLanguageParser.ArgumentsContext args = ctx.idexpropt().arguments();
+                CoralLanguageParser.ParamsContext paras = func.params();
+                System.out.println(ctx.getText());
                 StackController.INSTANCE.addScope(func.TKN_ID().getText());
-                return (T) visitFuncion((CoralLanguageParser.FuncionContext) variable.getValue());
-            } else {
+                if(!args.getText().isEmpty() && !paras.getText().isEmpty()){
+                    VariableController.INSTANCE.addVariable(paras.TKN_ID().getText(),paras.type().getText(),null,scope);
+                    VariableController.INSTANCE.setVariable(paras.TKN_ID().getText(),visitExpression(args.expression()),scope);
+                    CoralLanguageParser.Arguments_suffixContext args_suffix = ctx.idexpropt().arguments().arguments_suffix();
+                    CoralLanguageParser.Params_suffixContext paras_suffix = func.params().params_suffix();
+                    while(paras_suffix.TKN_ID()!=null && args_suffix.expression()!=null){
+                        VariableController.INSTANCE.addVariable(paras_suffix.TKN_ID().getText(),paras_suffix.type().getText(),null,scope);
+                        VariableController.INSTANCE.setVariable(paras_suffix.TKN_ID().getText(),visitExpression(args_suffix.expression()),scope);
+                        paras_suffix = paras_suffix.params_suffix();
+                        args_suffix = args_suffix.arguments_suffix();
+                    }
+                }
+                return (T)visitFuncion((CoralLanguageParser.FuncionContext)variable.getValue());
+            }else{
+                Variable variable = VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText(),StackController.INSTANCE.getScope());
                 return (T) variable.getValue();
             }
         } else if (ctx.number() != null) {

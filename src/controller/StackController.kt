@@ -3,14 +3,16 @@ package controller
 object StackController {
     private val scopeStack =  ArrayList<String>()
     init {
-        addScope("Global")
+        scopeStack.add("Global")
     }
     fun addScope(scopeName: String) {
         scopeStack.add(scopeName)
+        VariableController.createScope(scopeName)
     }
 
     fun removeScope(){
         scopeStack.removeAt(scopeStack.size-1)
+        VariableController.deleteScope(scopeStack.get(scopeStack.size-1))
     }
     fun getScope():String{
         return scopeStack.get(scopeStack.size-1)
