@@ -27,7 +27,9 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitNonempty(CoralLanguageParser.NonemptyContext ctx) {
-        if (ctx.vardeclaration() != null) {
+        if (ctx == null) {
+            return null;
+        } else if (ctx.vardeclaration() != null) {
             VariableController.INSTANCE.addFromVardeclarationContext(ctx.vardeclaration());
             visitBody(ctx.body());
         } else if (ctx.idcall() != null) {
@@ -39,16 +41,48 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
         } else if (ctx.forloop() != null) {
             visitForloop(ctx.forloop());
         } else if (ctx.whileloop() != null) {
-            System.out.println("While");
             visitWhileloop(ctx.whileloop());
         } else if (ctx.ifstatement() != null) {
-            System.out.println("if");
+            visitIfstatement(ctx.ifstatement());
         } else if (ctx.srn() != null) {
             System.out.println("Srn");
             visitBody(ctx.body());
         }
         return null;
     }
+
+    @Override
+    public T visitIfstatement(CoralLanguageParser.IfstatementContext ctx) {
+        if ((Boolean) visitBoolexpr(ctx.boolexpr())) {
+            visitNonempty(ctx.nonempty());
+            visitBody(ctx.body());
+            return null;
+        } else if (ctx.elseifstat() != null) {
+            visitElseifstat(ctx.elseifstat());
+        }
+        return null;
+    }
+
+    @Override
+    public T visitElseifstat(CoralLanguageParser.ElseifstatContext ctx) {
+        if (ctx == null) return null;
+        if (ctx.boolexpr()!=null && (Boolean) visitBoolexpr(ctx.boolexpr())) {
+            visitNonempty(ctx.nonempty());
+            visitBody(ctx.body());
+            return null;
+        } else {
+            if (ctx.elseifstat() != null) {
+                visitElseifstat(ctx.elseifstat());
+            }
+            if (ctx.elsestatement() != null) {
+                visitNonempty(ctx.elsestatement().nonempty());
+                visitBody(ctx.elsestatement().body());
+                return null;
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public T visitForloop(CoralLanguageParser.ForloopContext ctx) {
@@ -75,7 +109,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitIdcall(CoralLanguageParser.IdcallContext ctx) {
         String currentVarName = ctx.TKN_ID().getText();
-        Variable var = VariableController.INSTANCE.getVariable(currentVarName);
+        VariableController.INSTANCE.getVariable(currentVarName);
         if (ctx.TKN_OPENING_PAR() == null) {
             AssignVariableStrategy strategy = AssignVariableStrategy.ONLY_VALUE;
             Integer arrPosition = null;
@@ -116,6 +150,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitBody(CoralLanguageParser.BodyContext ctx) {
+        if(ctx==null ) return null;
         if (ctx.nonempty() != null) {
             visitNonempty(ctx.nonempty());
         }

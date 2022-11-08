@@ -1,9 +1,16 @@
-integer i
 integer a
 integer b
+integer x
 integer rows
 a = 1
 b=2
-rows=3
-for i = 0; i <= rows; i = i + 1
-      Put i to output
+rows=3000
+x=3
+if x == 1
+    Put x to output
+elseif x==2
+    Put b to output
+elseif x==3
+     Put b+5 to output
+else
+    Put rows to output
