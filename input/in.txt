@@ -1,16 +1,7 @@
-integer a
-integer b
-integer x
-integer rows
-a = 1
-b=2
-rows=3000
-x=3
-if x == 1
-    Put x to output
-elseif x==2
-    Put b to output
-elseif x==3
-     Put b+5 to output
-else
-    Put rows to output
+Function FtInchToCm(float numFt, float numInch) returns float numCm
+   numCm = ((numFt * 12) + numInch) * 2.54
+
+Function Main() returns nothing
+   float resultCm
+   resultCm = FtInchToCm(5, 6)
+   Put resultCm to output

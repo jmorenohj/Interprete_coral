@@ -53,6 +53,7 @@ idcall: TKN_ID idopt idstuff
       | TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
       ;
 
+
 idstuff: TKN_ASSIGN assignation;
 
 idopt: arrpos
@@ -161,7 +162,6 @@ boolexpr6: NOT TKN_OPENING_PAR boolexpr TKN_CLOSING_PAR
          | TKN_OPENING_PAR boolexpr TKN_CLOSING_PAR
          | builtin
          | idexpropt
-
          | number;
 
 equals: TKN_EQUAL
