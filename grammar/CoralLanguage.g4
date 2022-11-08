@@ -79,8 +79,7 @@ inputstat: GET NEXT INPUT;
 
 outputstat: PUT outputopt TO OUTPUT outputending;
 
-outputopt: TKN_STR
-         | expression;
+outputopt: TKN_STR | expression;
 
 outputending: WITH expression DECIMAL PLACES
             |
@@ -247,6 +246,7 @@ PLACES:   'places';
 TKN_ID : [a-zA-Z][a-zA-Z0-9_]* ;
 TKN_INT : [0-9]+;
 TKN_FLOAT: [0-9]+( | [.][0-9]+);
-TKN_STR: [a-zA-Z][a-zA-Z0-9_]*;
+TKN_STR: '"' (ESC|~('\\'))*?('"');
+fragment ESC: '\\"' | '\\\\' | '\\n' | '\\t';
 ESP : [ \t\r\n]+ -> skip ;
 LINE_COMMENT: '//' ~[\r\n]* -> skip;

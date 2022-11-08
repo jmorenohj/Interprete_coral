@@ -4,6 +4,6 @@ integer b
 integer rows
 a = 1
 b=2
-rows=13
+rows=3
 for i = 0; i <= rows; i = i + 1
       Put i to output
