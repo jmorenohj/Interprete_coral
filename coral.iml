@@ -12,7 +12,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/antlr-4.10.1-complete.jar!/" />
+          <root url="jar://$MODULE_DIR$/antlr-runtime-4.10.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

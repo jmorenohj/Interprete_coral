@@ -2,6 +2,7 @@ import controller.AssignVariableStrategy;
 import controller.VariableController;
 import models.Variable;
 
+import java.sql.Timestamp;
 import java.util.Scanner;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -15,9 +16,9 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     public T visitInicial(CoralLanguageParser.InicialContext ctx) {
         if (ctx.funcion() != null) {
             CoralLanguageParser.FunctionchainContext funChain = ctx.functionchain();
-            VariableController.INSTANCE.addVariable(ctx.funcion().TKN_ID().getText(),"FUNCTION",ctx.funcion());
-            while(funChain.FUNCTION()!=null){
-                VariableController.INSTANCE.addVariable(funChain.funcion().TKN_ID().getText(),"FUNCTION",funChain.funcion());
+            VariableController.INSTANCE.addVariable(ctx.funcion().TKN_ID().getText(), "FUNCTION", ctx.funcion());
+            while (funChain.FUNCTION() != null) {
+                VariableController.INSTANCE.addVariable(funChain.funcion().TKN_ID().getText(), "FUNCTION", funChain.funcion());
                 funChain = funChain.functionchain();
             }
             return visitMain(ctx.main());
@@ -53,8 +54,24 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitForloop(CoralLanguageParser.ForloopContext ctx) {
-        System.out.println("##### FOR LOOP #####");
-        System.out.println(ctx.getText());
+        String scopeId = new Timestamp(System.currentTimeMillis()).toString();
+        VariableController.INSTANCE.createScope(scopeId);
+        String varIter = ctx.TKN_ID().get(0).getText();
+        String initialVarValue = ctx.idstuff().get(0).assignation().getText();
+        VariableController.INSTANCE.setVariable(varIter, initialVarValue);
+        while ((Boolean) visitBoolexpr(ctx.boolexpr())) {
+            System.out.println("ENTERED FOR");
+            Double valueToAssign;
+            if (ctx.idstuff().get(1).assignation().expression() != null) {
+                valueToAssign = Double.parseDouble(this.visitExpression(ctx.idstuff().get(1).assignation().expression()).toString());
+            } else {
+                valueToAssign = scanner.nextDouble();
+            }
+            VariableController.INSTANCE.setVariable(ctx.TKN_ID().get(1).getText(), valueToAssign);
+            visitBody(ctx.body());
+            //visitNonempty(ctx.nonempty());
+        }
+        VariableController.INSTANCE.deleteScope(scopeId);
         return null;
     }
 
@@ -192,7 +209,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitExpression2(CoralLanguageParser.Expression2Context ctx) {
-        if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID()!=null ) {
+        if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID() != null) {
             return (T) VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText()).getValue();
         } else if (ctx.number() != null) {
             return (T) (Double) Double.parseDouble(ctx.number().getText());
@@ -230,17 +247,19 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitBoolexpr(CoralLanguageParser.BoolexprContext ctx) {
-        if (ctx.boolexpr_suffix().OR() != null) {
+        if(ctx==null) return null;
+        if (ctx.boolexpr_suffix() != null && ctx.boolexpr_suffix().OR() != null) {
             Boolean res = (Boolean) visitBoolexpr1(ctx.boolexpr1()) || (Boolean) visitBoolexpr_suffix(ctx.boolexpr_suffix());
             return (T) res;
         }
+
         return visitBoolexpr1(ctx.boolexpr1());
 
     }
 
     @Override
     public T visitBoolexpr_suffix(CoralLanguageParser.Boolexpr_suffixContext ctx) {
-        if (ctx.boolexpr_suffix().OR() != null) {
+        if (ctx.boolexpr_suffix() != null && ctx.boolexpr_suffix().OR() != null) {
             Boolean res = (Boolean) visitBoolexpr1(ctx.boolexpr1()) || (Boolean) visitBoolexpr_suffix(ctx.boolexpr_suffix());
             return (T) res;
         }
@@ -250,7 +269,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitBoolexpr1(CoralLanguageParser.Boolexpr1Context ctx) {
-        if (ctx.boolexpr1_suffix().AND() != null) {
+        if (ctx.boolexpr1_suffix() != null && ctx.boolexpr1_suffix().AND() != null) {
             Boolean res = (Boolean) visitBoolexpr2(ctx.boolexpr2()) && (Boolean) visitBoolexpr1_suffix(ctx.boolexpr1_suffix());
             return (T) res;
         }
@@ -259,7 +278,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitBoolexpr1_suffix(CoralLanguageParser.Boolexpr1_suffixContext ctx) {
-        if (ctx.boolexpr1_suffix().AND() != null) {
+        if (ctx.boolexpr1_suffix() != null && ctx.boolexpr1_suffix().AND() != null) {
             Boolean res = (Boolean) visitBoolexpr2(ctx.boolexpr2()) && (Boolean) visitBoolexpr1_suffix(ctx.boolexpr1_suffix());
             return (T) res;
         }
@@ -372,7 +391,8 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitBoolexpr5(CoralLanguageParser.Boolexpr5Context ctx) {
-        Double res = (Double) visitBoolexpr6(ctx.boolexpr6());
+        System.out.println(ctx.getText());
+        Double res = Double.parseDouble(visitBoolexpr6(ctx.boolexpr6()).toString());
         if (ctx.plusneg().TKN_MINUS() != null) res = -res;
         if (ctx.boolexpr5_suffix().aritm() == null) return (T) res;
         if (ctx.boolexpr5_suffix().aritm().TKN_MOD() != null) {
@@ -413,16 +433,17 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
             return visitBuiltin(ctx.builtin());
         } else if (ctx.number() != null) {
             return (T) (Double) Double.parseDouble(ctx.number().getText());
-        } else if (ctx.TKN_ID() != null) {
-            System.out.println("Id access");
-        } else {
+        } else if(ctx.boolexpr()!=null) {
             Boolean boolexpr = !(Boolean) visitBoolexpr(ctx.boolexpr());
             Double res;
             if (boolexpr) res = 1.0;
             else res = 0.0;
             return (T) res;
+        }else if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID() != null) {
+            return (T) VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText()).getValue();
+        }else{
+            return null;
         }
-        return null;
     }
 
 

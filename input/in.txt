@@ -1,8 +1,9 @@
-
+integer i
+integer a
+integer b
 integer rows
-rows=20
-rows = rows + 7
-rows = rows + 7
-rows = rows + 7
-for i = 0; i < rows; i = i + 1
-      Put rows to output
+a = 1
+b=2
+rows=13
+for i = 0; i <= rows; i = i + 1
+      Put i to output
