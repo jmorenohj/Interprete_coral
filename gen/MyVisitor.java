@@ -18,7 +18,6 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitInicial(CoralLanguageParser.InicialContext ctx) {
-
         if (ctx.funcion() != null) {
             CoralLanguageParser.FunctionchainContext funChain = ctx.functionchain();
             VariableController.INSTANCE.addVariable(ctx.funcion().TKN_ID().getText(), "FUNCTION", ctx.funcion());
@@ -50,25 +49,15 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
             VariableController.INSTANCE.addVariable(returnVarName,ctx.returnopt().vardeclaration().type().getText(),null,ctx.TKN_ID().getText());
             returnVar = VariableController.INSTANCE.getVariable(returnVarName,ctx.TKN_ID().getText());
         }
-
         visitNonempty(ctx.nonempty());
-
-
-
-
-
-
         return null;
     }
-
-
 
     @Override
     public T visitNonempty(CoralLanguageParser.NonemptyContext ctx) {
         if (ctx == null) {
             return null;
         } else if (ctx.vardeclaration() != null) {
-            System.out.println(StackController.INSTANCE.getScope());
             VariableController.INSTANCE.addFromStackContext(ctx.vardeclaration(),StackController.INSTANCE.getScope());
             visitBody(ctx.body());
         } else if (ctx.idcall() != null) {
@@ -149,7 +138,6 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     public T visitIdcall(CoralLanguageParser.IdcallContext ctx) {
         String currentVarName = ctx.TKN_ID().getText();
         Variable var = VariableController.INSTANCE.getVariable(currentVarName);
-        System.out.println(ctx.arguments());
         if (ctx.arguments() == null) {
             AssignVariableStrategy strategy = AssignVariableStrategy.ONLY_VALUE;
             Integer arrPosition = null;
@@ -178,7 +166,6 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
                         VariableController.INSTANCE.setArrayElement(currentVarName, arrPosition, valueToAssign.intValue());
                 case ONLY_VALUE -> VariableController.INSTANCE.setVariable(currentVarName, valueToAssign);
             }
-            System.out.println(VariableController.INSTANCE.getVariable(currentVarName));
         } else {
             //WHEN IS A CALL FUNCTION
             System.out.println(ctx.TKN_CLOSING_PAR());
@@ -200,17 +187,15 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitOutputstat(CoralLanguageParser.OutputstatContext ctx) {
         if (ctx.outputopt().TKN_STR() != null) {
-            System.out.println(ctx.outputopt().TKN_STR().getText());
+            String text=ctx.outputopt().TKN_STR().getText();
+            System.out.print(new Formatter().format(text.substring(1, text.length()-1).replace("\\n", "%n")));
         } else {
             Double res = (Double) visitExpression(ctx.outputopt().expression());
-            NumberFormat nf = NumberFormat.getInstance();
             if (ctx.outputending().expression() != null) {
                 Integer places = (Integer) (int) (double) (Double) visitExpression(ctx.outputending().expression());
-                nf.setMaximumFractionDigits(places);
-                System.out.println(nf.format(res));
+                System.out.printf("%."+places+"f", res);
             } else {
-                nf.setMaximumFractionDigits(0);
-                System.out.println(nf.format(res));
+                System.out.print(res);
             }
         }
         return null;
