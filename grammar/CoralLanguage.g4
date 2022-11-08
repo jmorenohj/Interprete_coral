@@ -56,9 +56,9 @@ idcall: TKN_ID idopt idstuff
 
 idstuff: TKN_ASSIGN assignation;
 
-idopt: arrpos
-     | dotsize
-     |
+idopt: TKN_ID arrpos
+     | TKN_ID dotsize
+     | TKN_ID
      ;
 
 dotsize: TKN_PERIOD SIZE;
@@ -128,8 +128,8 @@ plusneg: TKN_MINUS
        |
        ;
 
-idexpropt: TKN_ID idopt
-         | TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
+idexpropt: TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
+        | idopt
          ;
 
 boolexpr: boolexpr1 boolexpr_suffix;

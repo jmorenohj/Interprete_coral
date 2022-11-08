@@ -1,10 +1,13 @@
 import controller.AssignVariableStrategy;
 import controller.StackController;
 import controller.VariableController;
+
 import java.sql.Timestamp;
 import java.util.Scanner;
+
 import models.DataTypes;
 import models.Variable;
+
 import java.util.ArrayList;
 
 import java.util.*;
@@ -39,15 +42,15 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     }
 
     @Override
-    public T visitFuncion(CoralLanguageParser.FuncionContext ctx){
+    public T visitFuncion(CoralLanguageParser.FuncionContext ctx) {
         VariableController.INSTANCE.createScope(ctx.TKN_ID().getText());
-        Boolean returns = ctx.returnopt().NOTHING()==null;
+        Boolean returns = ctx.returnopt().NOTHING() == null;
         String returnVarName;
         Variable returnVar;
-        if(returns){
+        if (returns) {
             returnVarName = ctx.returnopt().vardeclaration().TKN_ID().getText();
-            VariableController.INSTANCE.addVariable(returnVarName,ctx.returnopt().vardeclaration().type().getText(),null,ctx.TKN_ID().getText());
-            returnVar = VariableController.INSTANCE.getVariable(returnVarName,ctx.TKN_ID().getText());
+            VariableController.INSTANCE.addVariable(returnVarName, ctx.returnopt().vardeclaration().type().getText(), null, ctx.TKN_ID().getText());
+            returnVar = VariableController.INSTANCE.getVariable(returnVarName, ctx.TKN_ID().getText());
         }
         visitNonempty(ctx.nonempty());
         return null;
@@ -58,7 +61,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
         if (ctx == null) {
             return null;
         } else if (ctx.vardeclaration() != null) {
-            VariableController.INSTANCE.addFromStackContext(ctx.vardeclaration(),StackController.INSTANCE.getScope());
+            VariableController.INSTANCE.addFromStackContext(ctx.vardeclaration(), StackController.INSTANCE.getScope());
             visitBody(ctx.body());
         } else if (ctx.idcall() != null) {
             visitIdcall(ctx.idcall());
@@ -94,7 +97,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitElseifstat(CoralLanguageParser.ElseifstatContext ctx) {
         if (ctx == null) return null;
-        if (ctx.boolexpr()!=null && (Boolean) visitBoolexpr(ctx.boolexpr())) {
+        if (ctx.boolexpr() != null && (Boolean) visitBoolexpr(ctx.boolexpr())) {
             visitNonempty(ctx.nonempty());
             visitBody(ctx.body());
             return null;
@@ -161,10 +164,15 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
                 valueToAssign = scanner.nextDouble();
             }
             switch (strategy) {
-                case DOT_SIZE -> VariableController.INSTANCE.setArraySize(currentVarName, valueToAssign.intValue());
-                case ARR_POSITION ->
-                        VariableController.INSTANCE.setArrayElement(currentVarName, arrPosition, valueToAssign.intValue());
-                case ONLY_VALUE -> VariableController.INSTANCE.setVariable(currentVarName, valueToAssign);
+                case DOT_SIZE:
+                    VariableController.INSTANCE.setArraySize(currentVarName, valueToAssign.intValue());
+                    break;
+                case ARR_POSITION:
+                    VariableController.INSTANCE.setArrayElement(currentVarName, arrPosition, valueToAssign.intValue());
+                    break;
+                case ONLY_VALUE:
+                    VariableController.INSTANCE.setVariable(currentVarName, valueToAssign);
+                    break;
             }
         } else {
             //WHEN IS A CALL FUNCTION
@@ -177,7 +185,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitBody(CoralLanguageParser.BodyContext ctx) {
-        if(ctx==null ) return null;
+        if (ctx == null) return null;
         if (ctx.nonempty() != null) {
             visitNonempty(ctx.nonempty());
         }
@@ -187,13 +195,13 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitOutputstat(CoralLanguageParser.OutputstatContext ctx) {
         if (ctx.outputopt().TKN_STR() != null) {
-            String text=ctx.outputopt().TKN_STR().getText();
-            System.out.print(new Formatter().format(text.substring(1, text.length()-1).replace("\\n", "%n")));
+            String text = ctx.outputopt().TKN_STR().getText();
+            System.out.print(new Formatter().format(text.substring(1, text.length() - 1).replace("\\n", "%n")));
         } else {
             Double res = (Double) visitExpression(ctx.outputopt().expression());
             if (ctx.outputending().expression() != null) {
                 Integer places = (Integer) (int) (double) (Double) visitExpression(ctx.outputending().expression());
-                System.out.printf("%."+places+"f", res);
+                System.out.printf("%." + places + "f", res);
             } else {
                 System.out.print(res);
             }
@@ -265,13 +273,13 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitExpression2(CoralLanguageParser.Expression2Context ctx) {
-        if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID()!=null ) {
+        if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID() != null) {
             Variable variable = VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText());
-            if(variable.getType()== DataTypes.FUNCTION){
-                CoralLanguageParser.FuncionContext func = (CoralLanguageParser.FuncionContext)variable.getValue();
+            if (variable.getType() == DataTypes.FUNCTION) {
+                CoralLanguageParser.FuncionContext func = (CoralLanguageParser.FuncionContext) variable.getValue();
                 StackController.INSTANCE.addScope(func.TKN_ID().getText());
-                return (T)visitFuncion((CoralLanguageParser.FuncionContext)variable.getValue());
-            }else{
+                return (T) visitFuncion((CoralLanguageParser.FuncionContext) variable.getValue());
+            } else {
                 return (T) variable.getValue();
             }
         } else if (ctx.number() != null) {
@@ -453,6 +461,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitBoolexpr5(CoralLanguageParser.Boolexpr5Context ctx) {
+        System.out.println(ctx.getText());
         Double res = Double.parseDouble(visitBoolexpr6(ctx.boolexpr6()).toString());
         if (ctx.plusneg().TKN_MINUS() != null) res = -res;
         if (ctx.boolexpr5_suffix().aritm() == null) return (T) res;
