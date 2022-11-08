@@ -128,8 +128,8 @@ plusneg: TKN_MINUS
        |
        ;
 
-idexpropt: TKN_ID idopt
-         | TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
+idexpropt: TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
+         | TKN_ID idopt
          ;
 
 boolexpr: boolexpr1 boolexpr_suffix;

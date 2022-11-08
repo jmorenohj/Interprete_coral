@@ -1,4 +1,4 @@
-// Generated from /Users/puntored/Desktop/UN/programming_languages/Interprete_coral/grammar/CoralLanguage.g4 by ANTLR 4.10.1
+// Generated from /home/jose/Documentos/Entrega3.0lenguajes/Interprete_coral/grammar/CoralLanguage.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -2723,14 +2723,14 @@ public class CoralLanguageParser extends Parser {
 
 	public static class IdexproptContext extends ParserRuleContext {
 		public TerminalNode TKN_ID() { return getToken(CoralLanguageParser.TKN_ID, 0); }
-		public IdoptContext idopt() {
-			return getRuleContext(IdoptContext.class,0);
-		}
 		public TerminalNode TKN_OPENING_PAR() { return getToken(CoralLanguageParser.TKN_OPENING_PAR, 0); }
 		public ArgumentsContext arguments() {
 			return getRuleContext(ArgumentsContext.class,0);
 		}
 		public TerminalNode TKN_CLOSING_PAR() { return getToken(CoralLanguageParser.TKN_CLOSING_PAR, 0); }
+		public IdoptContext idopt() {
+			return getRuleContext(IdoptContext.class,0);
+		}
 		public IdexproptContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2763,20 +2763,20 @@ public class CoralLanguageParser extends Parser {
 				setState(360);
 				match(TKN_ID);
 				setState(361);
-				idopt();
+				match(TKN_OPENING_PAR);
+				setState(362);
+				arguments();
+				setState(363);
+				match(TKN_CLOSING_PAR);
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(362);
-				match(TKN_ID);
-				setState(363);
-				match(TKN_OPENING_PAR);
-				setState(364);
-				arguments();
 				setState(365);
-				match(TKN_CLOSING_PAR);
+				match(TKN_ID);
+				setState(366);
+				idopt();
 				}
 				break;
 			}
@@ -4410,10 +4410,10 @@ public class CoralLanguageParser extends Parser {
 		"\n\u0000\u0000\u0164\u0167\u0005\t\u0000\u0000\u0165\u0167\u0001\u0000"+
 		"\u0000\u0000\u0166\u0163\u0001\u0000\u0000\u0000\u0166\u0164\u0001\u0000"+
 		"\u0000\u0000\u0166\u0165\u0001\u0000\u0000\u0000\u0167K\u0001\u0000\u0000"+
-		"\u0000\u0168\u0169\u00053\u0000\u0000\u0169\u0170\u0003\u001e\u000f\u0000"+
-		"\u016a\u016b\u00053\u0000\u0000\u016b\u016c\u0005\b\u0000\u0000\u016c"+
-		"\u016d\u0003$\u0012\u0000\u016d\u016e\u0005\u0007\u0000\u0000\u016e\u0170"+
-		"\u0001\u0000\u0000\u0000\u016f\u0168\u0001\u0000\u0000\u0000\u016f\u016a"+
+		"\u0000\u0168\u0169\u00053\u0000\u0000\u0169\u016a\u0005\b\u0000\u0000"+
+		"\u016a\u016b\u0003$\u0012\u0000\u016b\u016c\u0005\u0007\u0000\u0000\u016c"+
+		"\u0170\u0001\u0000\u0000\u0000\u016d\u016e\u00053\u0000\u0000\u016e\u0170"+
+		"\u0003\u001e\u000f\u0000\u016f\u0168\u0001\u0000\u0000\u0000\u016f\u016d"+
 		"\u0001\u0000\u0000\u0000\u0170M\u0001\u0000\u0000\u0000\u0171\u0172\u0003"+
 		"R)\u0000\u0172\u0173\u0003P(\u0000\u0173O\u0001\u0000\u0000\u0000\u0174"+
 		"\u0175\u0005\'\u0000\u0000\u0175\u0176\u0003R)\u0000\u0176\u0177\u0003"+

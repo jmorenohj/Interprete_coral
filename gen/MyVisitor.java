@@ -278,8 +278,8 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitExpression2(CoralLanguageParser.Expression2Context ctx) {
         if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID()!=null ) {
-            Variable variable = VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText(),StackController.INSTANCE.getScope());
-            if(variable.getType()== DataTypes.FUNCTION){
+            if(VariableController.INSTANCE.scopeContainsVariable(ctx.idexpropt().TKN_ID().getText(),"Global")){
+                Variable variable = VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText(),StackController.INSTANCE.getScope());
                 CoralLanguageParser.FuncionContext func = (CoralLanguageParser.FuncionContext)variable.getValue();
                 String scope = func.TKN_ID().getText();
                 CoralLanguageParser.ArgumentsContext args = ctx.idexpropt().arguments();
@@ -300,6 +300,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
                 }
                 return (T)visitFuncion((CoralLanguageParser.FuncionContext)variable.getValue());
             }else{
+                Variable variable = VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText(),StackController.INSTANCE.getScope());
                 return (T) variable.getValue();
             }
         } else if (ctx.number() != null) {
