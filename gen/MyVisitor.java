@@ -120,6 +120,8 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
         String initialVarValue = ctx.idstuff().get(0).assignation().getText();
         VariableController.INSTANCE.setVariable(varIter, initialVarValue);
         while ((Boolean) visitBoolexpr(ctx.boolexpr())) {
+            visitNonempty(ctx.nonempty());
+            visitBody(ctx.body());
             Double valueToAssign;
             if (ctx.idstuff().get(1).assignation().expression() != null) {
                 valueToAssign = Double.parseDouble(this.visitExpression(ctx.idstuff().get(1).assignation().expression()).toString());
@@ -127,8 +129,6 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
                 valueToAssign = scanner.nextDouble();
             }
             VariableController.INSTANCE.setVariable(ctx.TKN_ID().get(1).getText(), valueToAssign);
-            visitNonempty(ctx.nonempty());
-            visitBody(ctx.body());
         }
         VariableController.INSTANCE.deleteScope(scopeId);
         return null;
@@ -315,7 +315,6 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
             Boolean res = (Boolean) visitBoolexpr1(ctx.boolexpr1()) || (Boolean) visitBoolexpr_suffix(ctx.boolexpr_suffix());
             return (T) res;
         }
-
         return visitBoolexpr1(ctx.boolexpr1());
 
     }
@@ -496,7 +495,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
         } else if (ctx.number() != null) {
             return (T) (Double) Double.parseDouble(ctx.number().getText());
         } else if (ctx.boolexpr() != null) {
-            Boolean boolexpr = !(Boolean) visitBoolexpr(ctx.boolexpr());
+            Boolean boolexpr = (Boolean) visitBoolexpr(ctx.boolexpr());
             Double res;
             if (boolexpr) res = 1.0;
             else res = 0.0;

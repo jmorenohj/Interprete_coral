@@ -1,33 +1,20 @@
-// Loops & Branches
+// Arreglos en CORAL
+
+integer array(?) userNums
+float array(5) userVals
 
 float x
+float y
 integer i
-float xSquared
 
-x = -2
-Put "El número escogido fue:" to output
-Put x to output
-Put "\n" to output
+userNums.size = 5
 
-if x >= 1
-   Put "IF" to output
-   // Print x^2 desc
-   while x > 0
-      xSquared = x * x
-      Put xSquared to output with 3 decimal places
-      Put "\n" to output
-      x = x - 1
-elseif x == 0
-   Put "ELSEIF" to output
-   // Print "0.00000000"
-   Put x to output with 8 decimal places
-else
-   Put "ELSE\n" to output
-   // Count even numbers down from 10 to 0
-   for i = 10; i >= 0; i = i - 2
-      Put i to output with 2 decimal places
-      // Add 10-i spaces between numbers
-      x = i
-      while (x < 12)
-         Put " " to output
-         x = x + 2
+for i = 0; i < userNums.size; i = i + 1
+   userNums[i] = i * 2
+   userVals[4-i] = (4*i)/2
+
+x = userNums[3]
+y = userVals[3]
+
+for i = 0; i < userNums.size; i = i + 1
+   Put   userNums[i]    -  x+y     to   output
