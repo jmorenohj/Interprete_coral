@@ -1,18 +1,22 @@
 import controller.AssignVariableStrategy;
+import controller.StackController;
 import controller.VariableController;
+import models.DataTypes;
 import models.Variable;
+import java.util.ArrayList;
 
-import java.util.Scanner;
+import java.util.*;
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.lang.Math;
 
 public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
+
 
     Scanner scanner = new Scanner(System.in);
 
     @Override
     public T visitInicial(CoralLanguageParser.InicialContext ctx) {
+
         if (ctx.funcion() != null) {
             CoralLanguageParser.FunctionchainContext funChain = ctx.functionchain();
             VariableController.INSTANCE.addVariable(ctx.funcion().TKN_ID().getText(),"FUNCTION",ctx.funcion());
@@ -27,9 +31,47 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     }
 
     @Override
+    public T visitMain(CoralLanguageParser.MainContext ctx) {
+        visitNonempty(ctx.nonempty());
+        visitBody(ctx.body());
+        return null;
+    }
+
+    @Override
+    public T visitFuncion(CoralLanguageParser.FuncionContext ctx){
+        VariableController.INSTANCE.createScope(ctx.TKN_ID().getText());
+        Boolean returns = ctx.returnopt().NOTHING()==null;
+        String returnVarName;
+        Variable returnVar;
+        if(returns){
+            returnVarName = ctx.returnopt().vardeclaration().TKN_ID().getText();
+            VariableController.INSTANCE.addVariable(returnVarName,ctx.returnopt().vardeclaration().type().getText(),null,ctx.TKN_ID().getText());
+            returnVar = VariableController.INSTANCE.getVariable(returnVarName,ctx.TKN_ID().getText());
+        }
+
+        visitNonempty(ctx.nonempty());
+
+
+
+
+
+
+        return null;
+    }
+
+    @Override
+    public T visitBody(CoralLanguageParser.BodyContext ctx){
+        if(ctx.nonempty()!=null) {
+            return visitNonempty(ctx.nonempty());
+        }
+        return null;
+    }
+
+    @Override
     public T visitNonempty(CoralLanguageParser.NonemptyContext ctx) {
         if (ctx.vardeclaration() != null) {
-            VariableController.INSTANCE.addFromVardeclarationContext(ctx.vardeclaration());
+            System.out.println(StackController.INSTANCE.getScope());
+            VariableController.INSTANCE.addFromStackContext(ctx.vardeclaration(),StackController.INSTANCE.getScope());
             visitBody(ctx.body());
         } else if (ctx.idcall() != null) {
             visitIdcall(ctx.idcall());
@@ -62,7 +104,8 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     public T visitIdcall(CoralLanguageParser.IdcallContext ctx) {
         String currentVarName = ctx.TKN_ID().getText();
         Variable var = VariableController.INSTANCE.getVariable(currentVarName);
-        if (ctx.TKN_OPENING_PAR() == null) {
+        System.out.println(ctx.arguments());
+        if (ctx.arguments() == null) {
             AssignVariableStrategy strategy = AssignVariableStrategy.ONLY_VALUE;
             Integer arrPosition = null;
             //WHEN IS A VAR
@@ -100,13 +143,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
         return visitChildren(ctx);
     }
 
-    @Override
-    public T visitBody(CoralLanguageParser.BodyContext ctx) {
-        if (ctx.nonempty() != null) {
-            visitNonempty(ctx.nonempty());
-        }
-        return null;
-    }
+
 
 
     @Override
@@ -193,7 +230,16 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitExpression2(CoralLanguageParser.Expression2Context ctx) {
         if (ctx.idexpropt() != null && ctx.idexpropt().TKN_ID()!=null ) {
-            return (T) VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText()).getValue();
+            Variable variable = VariableController.INSTANCE.getVariable(ctx.idexpropt().TKN_ID().getText());
+            if(variable.getType()== DataTypes.FUNCTION){
+                CoralLanguageParser.FuncionContext func = (CoralLanguageParser.FuncionContext)variable.getValue();
+                StackController.INSTANCE.addScope(func.TKN_ID().getText());
+
+                return (T)visitFuncion((CoralLanguageParser.FuncionContext)variable.getValue());
+            }else{
+                return (T) variable.getValue();
+            }
+
         } else if (ctx.number() != null) {
             return (T) (Double) Double.parseDouble(ctx.number().getText());
         } else if (ctx.expression() != null) {

@@ -4,6 +4,8 @@ import CoralLanguageParser
 import models.DataTypes
 import models.ExceptionInter
 import models.Variable
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.system.exitProcess
 
 enum class AssignVariableStrategy { DOT_SIZE, ARR_POSITION, ONLY_VALUE }
@@ -27,21 +29,21 @@ object VariableController {
         return null
     }
 
-    fun addFromVardeclarationContext(ctx: CoralLanguageParser.VardeclarationContext) {
+    fun addFromStackContext(ctx: CoralLanguageParser.VardeclarationContext, scope:String) {
         val type = ctx.type().text
         val id = ctx.TKN_ID().text
         val arrDeclaration = ctx.arrdeclaration().text
         if (arrDeclaration.isEmpty()) {
-            addVariable(id, type.uppercase(), null)
+            addVariable(id, type.uppercase(), null,scope)
             println(getVariable(id))
         } else {
             val length = getArrayLength(ctx.arrdeclaration())
             val typeEnum = if (type == "integer") "ARRAY_INT" else "ARRAY_FLOAT"
             if (length == null) {
-                addVariable(id, typeEnum, null)
+                addVariable(id, typeEnum, null,scope)
             } else {
                 val list = MutableList<Number>(length) { 0 }
-                addVariable(id, typeEnum, list)
+                addVariable(id, typeEnum, list,scope)
             }
             println(getVariable(id))
         }
@@ -57,7 +59,7 @@ object VariableController {
         scopes.remove(scopeName)
     }
 
-    private fun getScope(scopeName: String): HashMap<String, Variable> {
+    fun getScope(scopeName: String): HashMap<String, Variable> {
         if (!scopes.containsKey(scopeName)) {
             println("No existe el scope $scopeName")
             exitProcess(-1)
@@ -80,7 +82,7 @@ object VariableController {
             println("Error: $varName ya ha sido declarada")
             exitProcess(-1)
         }
-        scope[varName] = Variable(varType, varName, value)
+        scope[varName] = Variable(varType.uppercase(), varName, value)
     }
 
     fun getVariables(scopeName: String): HashMap<String, Variable> {

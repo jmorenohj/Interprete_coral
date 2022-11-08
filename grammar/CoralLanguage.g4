@@ -12,12 +12,13 @@ funcion: TKN_ID TKN_OPENING_PAR params TKN_CLOSING_PAR RETURNS returnopt nonempt
 
 main: MAIN TKN_OPENING_PAR TKN_CLOSING_PAR RETURNS NOTHING nonempty body;
 
-returnopt: vardeclaration NOTHING;
+returnopt: vardeclaration
+         |  NOTHING;
 
 type : INTEGER
      | FLOAT;
 
-params: type TKN_ID params
+params: type TKN_ID params_suffix
       |
       ;
 
@@ -51,6 +52,7 @@ arrdeclarationopt: TKN_INT
 idcall: TKN_ID idopt idstuff
       | TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
       ;
+
 
 idstuff: TKN_ASSIGN assignation;
 
@@ -98,7 +100,7 @@ elsestatement: ELSE nonempty body
 
 whileloop: WHILE boolexpr nonempty;
 
-forloop: FOR TKN_ID idstuff TKN_SEMICOLON boolexpr  TKN_SEMICOLON TKN_ID idstuff;
+forloop: FOR TKN_ID idstuff TKN_SEMICOLON boolexpr  TKN_SEMICOLON TKN_ID idstuff nonempty body;
 
 number: TKN_INT
       | TKN_FLOAT;
@@ -129,7 +131,6 @@ plusneg: TKN_MINUS
 
 idexpropt: TKN_ID idopt
          | TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
-         | idopt
          ;
 
 boolexpr: boolexpr1 boolexpr_suffix;
@@ -160,7 +161,7 @@ boolexpr5_suffix: aritm plusneg boolexpr6 boolexpr5_suffix
 boolexpr6: NOT TKN_OPENING_PAR boolexpr TKN_CLOSING_PAR
          | TKN_OPENING_PAR boolexpr TKN_CLOSING_PAR
          | builtin
-         | TKN_ID idexpropt
+         | idexpropt
          | number;
 
 equals: TKN_EQUAL
@@ -245,6 +246,7 @@ PLACES:   'places';
 TKN_ID : [a-zA-Z][a-zA-Z0-9_]* ;
 TKN_INT : [0-9]+;
 TKN_FLOAT: [0-9]+( | [.][0-9]+);
-TKN_STR: [a-zA-Z][a-zA-Z0-9_]*;
+TKN_STR: '"' (ESC|~('\\'))*?('"');
+fragment ESC: '\\"' | '\\\\' | '\\n' | '\\t';
 ESP : [ \t\r\n]+ -> skip ;
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
