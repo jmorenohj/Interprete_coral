@@ -1,7 +1,5 @@
 import controller.AssignVariableStrategy;
 import controller.VariableController;
-import models.Variable;
-
 import java.sql.Timestamp;
 import java.util.Scanner;
 import java.text.NumberFormat;
@@ -45,7 +43,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
         } else if (ctx.ifstatement() != null) {
             visitIfstatement(ctx.ifstatement());
         } else if (ctx.srn() != null) {
-            System.out.println("Srn");
+            //TODO: FINISH
             visitBody(ctx.body());
         }
         return null;
