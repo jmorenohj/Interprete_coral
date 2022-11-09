@@ -1,4 +1,4 @@
-// Generated from /home/jose/Documentos/Entrega3.0lenguajes/Interprete_coral/grammar/CoralLanguage.g4 by ANTLR 4.10.1
+// Generated from /Users/puntored/Desktop/UN/programming_languages/Interprete_coral/grammar/CoralLanguage.g4 by ANTLR 4.10.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;

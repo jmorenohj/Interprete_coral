@@ -7,7 +7,7 @@ public class Main {
         boolean isJoselito=!true;
         String file;
         if(isJoselito){
-            file="input/in1.txt";
+            file="input/05.in";
         }else{
             file="input/in.txt";
         }

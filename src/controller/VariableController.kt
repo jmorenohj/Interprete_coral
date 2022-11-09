@@ -1,14 +1,13 @@
 package controller
 
 import CoralLanguageParser
+import models.AssignVariableStrategy
 import models.DataTypes
 import models.ExceptionInter
 import models.Variable
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.system.exitProcess
-
-enum class AssignVariableStrategy { DOT_SIZE, ARR_POSITION, ONLY_VALUE }
 
 object VariableController {
     private const val globalScope = "Global"

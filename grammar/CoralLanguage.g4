@@ -8,9 +8,9 @@ functionchain: funcion FUNCTION functionchain
              |
              ;
 
-funcion: TKN_ID TKN_OPENING_PAR params TKN_CLOSING_PAR RETURNS returnopt nonempty body;
+funcion: TKN_ID TKN_OPENING_PAR params TKN_CLOSING_PAR RETURNS returnopt TKN_OPENING_CB nonempty body TKN_CLOSING_CB body;
 
-main: MAIN TKN_OPENING_PAR TKN_CLOSING_PAR RETURNS NOTHING nonempty body;
+main: MAIN TKN_OPENING_PAR TKN_CLOSING_PAR RETURNS NOTHING TKN_OPENING_CB nonempty body TKN_CLOSING_CB body;
 
 returnopt: vardeclaration
          | NOTHING;
@@ -49,16 +49,16 @@ arrdeclaration : ARRAY TKN_OPENING_PAR arrdeclarationopt TKN_CLOSING_PAR
 arrdeclarationopt: TKN_INT
                  | TKN_QUESTION_MARK;
 
-idcall: TKN_ID idopt idstuff
+idcall: idopt idstuff
       | TKN_ID TKN_OPENING_PAR arguments TKN_CLOSING_PAR
       ;
 
 
 idstuff: TKN_ASSIGN assignation;
 
-idopt: TKN_ID arrpos
+idopt: TKN_ID
+     | TKN_ID arrpos
      | TKN_ID dotsize
-     | TKN_ID
      ;
 
 dotsize: TKN_PERIOD SIZE;
@@ -86,20 +86,20 @@ outputending: WITH expression DECIMAL PLACES
             |
             ;
 
-ifstatement: IF boolexpr nonempty body elseifstat;
+ifstatement: IF boolexpr TKN_OPENING_CB nonempty body TKN_CLOSING_CB elseifstat;
 
-elseifstat: ELSEIF boolexpr nonempty body elseifstat elsestatement
+elseifstat: ELSEIF boolexpr TKN_OPENING_CB nonempty body TKN_CLOSING_CB elseifstat elsestatement
           | elsestatement
           |
           ;
 
-elsestatement: ELSE nonempty body
+elsestatement: ELSE TKN_OPENING_CB nonempty body TKN_CLOSING_CB body
              |
              ;
 
-whileloop: WHILE boolexpr nonempty;
+whileloop: WHILE boolexpr TKN_OPENING_CB nonempty body TKN_CLOSING_CB body;
 
-forloop: FOR TKN_ID idstuff TKN_SEMICOLON boolexpr  TKN_SEMICOLON TKN_ID idstuff nonempty body;
+forloop: FOR TKN_ID idstuff TKN_SEMICOLON boolexpr  TKN_SEMICOLON TKN_ID idstuff TKN_OPENING_CB nonempty body TKN_CLOSING_CB body;
 
 number: TKN_INT
       | TKN_FLOAT;
@@ -199,6 +199,8 @@ TKN_OPENING_PAR:  '(';
 TKN_PLUS:         '+';
 TKN_MINUS:        '-';
 TKN_TIMES:        '*';
+TKN_OPENING_CB:   '{';
+TKN_CLOSING_CB:   '}';
 TKN_DIV:          '/';
 TKN_MOD:          '%';
 TKN_EQUAL:        '==';
