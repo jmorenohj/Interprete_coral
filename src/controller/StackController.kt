@@ -1,21 +1,29 @@
 package controller
 
 object StackController {
-    private val scopeStack =  ArrayList<String>()
+    val scopeStack =  ArrayList<String>()
+    var stackSize = 0
     init {
         scopeStack.add("Global")
+        stackSize = 1
     }
     fun addScope(scopeName: String) {
         scopeStack.add(scopeName)
         VariableController.createScope(scopeName)
+        stackSize+=1
     }
 
     fun removeScope(){
-        scopeStack.removeAt(scopeStack.size-1)
-        VariableController.deleteScope(scopeStack.get(scopeStack.size-1))
+        VariableController.deleteScope(scopeStack.get(stackSize-1))
+        scopeStack.removeAt(stackSize-1)
+        stackSize -= 1
     }
     fun getScope():String{
-        return scopeStack.get(scopeStack.size-1)
+        return scopeStack.get(stackSize-1)
+    }
+
+    fun getPrevScope():String{
+        return scopeStack.get(stackSize-2);
     }
 
     fun checkForVariable(varName:String):Boolean{
