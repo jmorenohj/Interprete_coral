@@ -1,18 +1,13 @@
+// CORCHETES, SCOPE, FUNCTIONS, ARREGLO
 import controller.StackController;
 import controller.VariableController;
-
 import java.sql.Timestamp;
 import java.util.Scanner;
-
 import models.AssignVariableStrategy;
 import models.DataTypes;
 import models.IdOptResult;
 import models.Variable;
-
-import java.util.ArrayList;
-
 import java.util.*;
-import java.text.NumberFormat;
 import java.lang.Math;
 
 public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
@@ -38,7 +33,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitMain(CoralLanguageParser.MainContext ctx) {
         visitNonempty(ctx.nonempty());
-        ctx.body().forEach(this::visitBody);
+        visitBody(ctx.body());
         return null;
     }
 
@@ -52,13 +47,13 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
             returnVarName = ctx.returnopt().vardeclaration().TKN_ID().getText();
             VariableController.INSTANCE.addVariable(returnVarName, ctx.returnopt().vardeclaration().type().getText(), null, StackController.INSTANCE.getScope());
             visitNonempty(ctx.nonempty());
-            ctx.body().forEach(this::visitBody);
+            visitBody(ctx.body());
             returnVar = VariableController.INSTANCE.getVariable(returnVarName, ctx.TKN_ID().getText());
             StackController.INSTANCE.removeScope();
             return (T) returnVar.getValue();
         }
         visitNonempty(ctx.nonempty());
-        ctx.body().forEach(this::visitBody);
+        visitBody(ctx.body());
         StackController.INSTANCE.removeScope();
         System.out.println(StackController.INSTANCE.getScopeStack().toString());
         return null;
@@ -147,11 +142,11 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
 
     @Override
     public T visitIdopt(CoralLanguageParser.IdoptContext ctx) {
-        if(ctx.arrpos()!=null){
+        if (ctx.arrpos() != null) {
             return (T) new IdOptResult(AssignVariableStrategy.ARR_POSITION, ctx.TKN_ID().getText(), ctx.arrpos().expression().getText());
-        }else if(ctx.dotsize()!=null){
+        } else if (ctx.dotsize() != null) {
             return (T) new IdOptResult(AssignVariableStrategy.DOT_SIZE, ctx.TKN_ID().getText(), null);
-        }else{
+        } else {
             return (T) new IdOptResult(AssignVariableStrategy.ONLY_VALUE, ctx.TKN_ID().getText(), null);
         }
     }
@@ -159,7 +154,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitIdcall(CoralLanguageParser.IdcallContext ctx) {
         if (ctx.arguments() == null) {
-            IdOptResult currentVarName = (IdOptResult)visitIdopt(ctx.idopt());
+            IdOptResult currentVarName = (IdOptResult) visitIdopt(ctx.idopt());
             Variable var = VariableController.INSTANCE.getVariable(currentVarName.getName(), StackController.INSTANCE.getScope());
             //ASSIGNATION VALUE
             Double valueToAssign;
@@ -279,11 +274,11 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
     @Override
     public T visitExpression2(CoralLanguageParser.Expression2Context ctx) {
         if (ctx.idexpropt() != null && ctx.idexpropt().idopt() != null) {
-            IdOptResult variableNameObj= (IdOptResult) visitIdopt(ctx.idexpropt().idopt());
-            String varName=variableNameObj.getName();
+            IdOptResult variableNameObj = (IdOptResult) visitIdopt(ctx.idexpropt().idopt());
+            String varName = variableNameObj.getName();
             if (VariableController.INSTANCE.scopeContainsVariable(varName, "Global") && VariableController.INSTANCE.getVariable(varName, "Global").getType() == DataTypes.FUNCTION) {
                 prevContext = true;
-                IdOptResult currentVarName = (IdOptResult)visitIdopt(ctx.idexpropt().idopt());
+                IdOptResult currentVarName = (IdOptResult) visitIdopt(ctx.idexpropt().idopt());
                 Variable variable = VariableController.INSTANCE.getVariable(currentVarName.getName(), "Global");
                 CoralLanguageParser.FuncionContext func = (CoralLanguageParser.FuncionContext) variable.getValue();
                 String scope = new Timestamp(System.currentTimeMillis()).toString();
@@ -542,7 +537,7 @@ public class MyVisitor<T> extends CoralLanguageBaseVisitor<T> {
             else res = 0.0;
             return (T) res;
         } else if (ctx.idexpropt() != null && ctx.idexpropt().idopt() != null) {
-            IdOptResult currentVarName = (IdOptResult)visitIdopt(ctx.idexpropt().idopt());
+            IdOptResult currentVarName = (IdOptResult) visitIdopt(ctx.idexpropt().idopt());
             if (VariableController.INSTANCE.scopeContainsVariable(currentVarName.getName(), "Global")) {
                 Variable variable = VariableController.INSTANCE.getVariable(currentVarName.getName(), "Global");
                 CoralLanguageParser.FuncionContext func = (CoralLanguageParser.FuncionContext) variable.getValue();

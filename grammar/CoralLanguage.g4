@@ -8,9 +8,9 @@ functionchain: funcion FUNCTION functionchain
              |
              ;
 
-funcion: TKN_ID TKN_OPENING_PAR params TKN_CLOSING_PAR RETURNS returnopt TKN_OPENING_CB nonempty body TKN_CLOSING_CB body;
+funcion: TKN_ID TKN_OPENING_PAR params TKN_CLOSING_PAR RETURNS returnopt TKN_OPENING_CB nonempty body TKN_CLOSING_CB;
 
-main: MAIN TKN_OPENING_PAR TKN_CLOSING_PAR RETURNS NOTHING TKN_OPENING_CB nonempty body TKN_CLOSING_CB body;
+main: MAIN TKN_OPENING_PAR TKN_CLOSING_PAR RETURNS NOTHING TKN_OPENING_CB nonempty body TKN_CLOSING_CB;
 
 returnopt: vardeclaration
          | NOTHING;
